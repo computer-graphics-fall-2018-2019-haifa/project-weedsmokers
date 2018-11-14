@@ -20,6 +20,7 @@ private:
 	std::string modelName;
 
 public:
+
 	MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName = "");
 	virtual ~MeshModel();
 

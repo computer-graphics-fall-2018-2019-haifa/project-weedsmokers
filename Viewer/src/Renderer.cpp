@@ -367,6 +367,3 @@ int	Renderer::ReScaleY(float num)
 {
 	return num * viewportHeight;
 }
-
-
-
