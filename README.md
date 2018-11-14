@@ -1,11 +1,21 @@
 # Computer Graphics 203.3710, Winter 2018/2019
 ## Students Team data
 
-Name: 'Your real name'  
-Student Number: 'Your student number'
+<<<<<<< HEAD
+<<<<<<< HEAD
+Name: 'Omar khateeb'  
+Student Number: '211706445'
+=======
+Name: 'Naseem Yehya'  
+Student Number: '212001689'
+>>>>>>> b87b4ba37e6006025e2f94a4362b4b549955b7fe
+=======
+Name: 'Naseem Yehya'  
+Student Number: '212001689'
+>>>>>>> b87b4ba37e6006025e2f94a4362b4b549955b7fe
 
-Name: 'Your real name'  
-Student Number: 'Your student number'
+Name: 'Naseem yehya'  
+Student Number: '212001689'
 
 ### Lecturer
 *Roi Poranne*

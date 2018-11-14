@@ -30,12 +30,24 @@ private:
 
 public:
 	Renderer(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
+	//Renderer(int viewportWidth=0, int viewportHeight=0, int viewportX = 0, int viewportY = 0);
 	~Renderer();
 
 	void Render(const Scene& scene);
 	void SwapBuffers();
+	void drawLine(const glm::vec2 & p0, const glm::vec2 & p1);
+	void drawLineLow(const glm::vec2 & p0, const glm::vec2 & p1);
+	void drawLineHight(const glm::vec2 & p0, const glm::vec2 & p1);
+	void drawTriangles(const std::vector<glm::vec3> * points, const glm::vec3 * normals= NULL );
+	int ReScaleX(float num);
+	int ReScaleY(float num);
 	void ClearColorBuffer(const glm::vec3& color);
 	void SetViewport(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
 
+
+	void putPixel2(int i, int j, const glm::vec3& color);
+
+	// write function that takes a model and draw it
 	// Add more methods/functionality as needed...
 };
+

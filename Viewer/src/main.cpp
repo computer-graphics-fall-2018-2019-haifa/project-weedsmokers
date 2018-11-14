@@ -1,3 +1,4 @@
+
 #define _USE_MATH_DEFINES
 
 #include <imgui/imgui.h>
@@ -5,6 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
+#include <iostream>
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -26,14 +28,22 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-	
+
 	// Handle mouse scrolling here...
 }
 
 int main(int argc, char **argv)
 {
+	glm::vec2 p0, p1;
+	p0.x = 0.15;
+	p0.y = 0.12;
+	p1.x = 0.379;
+	p1.y = 0.700;
+	
+
+
 	// Create GLFW window
-	int windowWidth = 1280, windowHeight = 720;
+	int windowWidth = 1280 , windowHeight = 720 ;
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
 	if (!window)
 	{
@@ -57,22 +67,29 @@ int main(int argc, char **argv)
 	// Register a mouse scroll-wheel callback
 	glfwSetScrollCallback(window, ScrollCallback);
 
+	renderer.drawLine(p0, p1);
 	// This is the main game loop..
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
+	while (!glfwWindowShouldClose(window))
+	{
+		
+		glfwPollEvents();
 		StartFrame();
 
 		// Here we build the menus for the next frame. Feel free to pass more arguments to this function call
 		DrawImguiMenus(io, scene);
 
 		// Render the next frame
+	
+
 		RenderFrame(window, scene, renderer, io);
-    }
+
+		
+		
+	}
 
 	// If we're here, then we're done. Cleanup memory.
 	Cleanup(window);
-    return 0;
+	return 0;
 }
 
 static void GlfwErrorCallback(int error, const char* description)

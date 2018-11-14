@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-
+#include <iostream>
 #include "Renderer.h"
 #include "InitShader.h"
 #include "MeshModel.h"
@@ -29,6 +29,8 @@ void Renderer::putPixel(int i, int j, const glm::vec3& color)
 {
 	if (i < 0) return; if (i >= viewportWidth) return;
 	if (j < 0) return; if (j >= viewportHeight) return;
+
+	
 	colorBuffer[INDEX(viewportWidth, i, j, 0)] = color.x;
 	colorBuffer[INDEX(viewportWidth, i, j, 1)] = color.y;
 	colorBuffer[INDEX(viewportWidth, i, j, 2)] = color.z;
@@ -74,6 +76,11 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 
 void Renderer::Render(const Scene& scene)
 {
+	glm::vec2 p0, p1;
+	p0.x = 0.0;
+	p0.y = 0.0;
+	p1.x = 1;
+	p1.y = 1;
 	//#############################################
 	//## You should override this implementation ##
 	//## Here you should render the scene.       ##
@@ -98,6 +105,7 @@ void Renderer::Render(const Scene& scene)
 			}
 		}
 	}
+	drawLine(p0, p1);
 }
 
 //##############################
@@ -212,3 +220,153 @@ void Renderer::SwapBuffers()
 	// Finally renders the data.
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+
+void Renderer::drawLine(const glm::vec2& p0, const glm::vec2& p1)
+{
+	
+	
+	if (std::abs(p1.y - p0.y)  < std::abs(p1.x - p0.x))
+	{ // line slope is less than 1
+		if (p0.x > p1.x)
+			drawLineLow(p0, p1);
+		else
+			drawLineLow(p1, p0);
+	}
+	else
+	{	// Line slope is greater/equal one
+		if(p0.y > p1.y)
+			drawLineHight(p1, p0);
+		else
+			drawLineHight(p0, p1);
+
+	}
+
+
+
+}
+
+void Renderer::drawLineLow(const glm::vec2& p0, const glm::vec2& p1)
+{
+	glm::vec2 temp_p0=p0, temp_p1=p1;
+	temp_p0.x = ReScaleX(p0.x);
+	temp_p0.y = ReScaleY(p0.y);
+	temp_p1.x = ReScaleX(p1.x);
+	temp_p1.y = ReScaleY(p1.y);
+
+	glm::vec3 color;
+	int D,x,y,sign = 1;
+	glm::vec2 temp;
+	temp = temp_p1 - temp_p0;
+	color.x = 100;
+	color.y = 200;
+	color.z = 150;
+
+	if (temp.y < 0)
+	{
+		sign = -1;
+		temp.y = temp.y * (-1);
+	}
+
+	D = 2 * temp.y - temp.x;
+	y = temp_p0.y;
+
+	for (x = temp_p0.x; x <= temp_p1.x; x++)
+	{
+		
+		putPixel(x, y,color );
+			if (D > 0)
+			{
+				y = y + sign;
+				D = D - 2 * temp.x;
+			}
+
+		D = D + 2 * temp.y;
+	}
+
+}
+
+void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
+{
+	
+	glm::vec3 color;
+	glm::vec2 temp_p0, temp_p1;
+	temp_p0.x = ReScaleX(p0.x);
+	temp_p0.y = ReScaleY(p0.y);
+	temp_p1.x = ReScaleX(p1.x);
+	temp_p1.y = ReScaleY(p1.y);
+	
+
+	
+
+	int D, x, y, sign = 1;
+	glm::vec2 temp;
+	temp = temp_p1 - temp_p0;
+	color.x = 0;
+	color.y = 0;
+	color.z = 0;
+
+	if (temp.x < 0)
+	{
+		sign = -1;
+		temp.x = temp.x * (-1);
+	}
+
+	D = 2 * temp.x - temp.y;
+	x = temp_p0.x;
+	for (y = temp_p0.y; y <= temp_p1.y; y++)
+	{
+	//	std::cout << "x=" << x << " y=" << y << std::endl;
+		putPixel(x, y, color);
+		if (D > 0)
+		{
+			x = x + sign;
+			D = D - 2 * temp.y;
+		}
+
+		D = D + 2 * temp.x;
+	}
+}
+
+
+
+
+void Renderer::drawTriangles(const std::vector<glm::vec3>*  points, const glm::vec3* normals)
+{
+	glm::vec3* temp;
+	glm::vec3 v1, v2, v3;
+	int i;
+	for (i = 0; i < points->size(); i++)
+	{
+		v1 = (*points)[i];
+		v2 = (*points)[i + 1];
+		v3 = (*points)[i + 2];
+		
+		if (v1.z != 0)
+			v1 = v1 / v1.z;
+		if (v2.z != 0)
+			v2 = v2 / v2.z;
+		if (v3.z != 0)
+			v3 = v3 / v3.z;
+
+		drawLine(v1,v2 );
+		drawLine(v2, v3);
+		drawLine(v1, v3);
+
+
+	}
+
+}
+
+int	Renderer::ReScaleX(float num)
+{
+	return num * viewportWidth;
+}
+
+int	Renderer::ReScaleY(float num)
+{
+	return num * viewportHeight;
+}
+
+
+
