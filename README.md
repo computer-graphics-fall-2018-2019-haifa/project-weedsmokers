@@ -3,6 +3,7 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Name: 'Omar khateeb'  
 Student Number: '211706445'
 =======
@@ -16,6 +17,13 @@ Student Number: '212001689'
 
 Name: 'Naseem yehya'  
 Student Number: '212001689'
+=======
+Name: 'Naseem Yehya'  
+Student Number: '212001689'
+
+Name: 'Your real name'  
+Student Number: 'Your student number'
+>>>>>>> b87b4ba37e6006025e2f94a4362b4b549955b7fe
 
 ### Lecturer
 *Roi Poranne*
