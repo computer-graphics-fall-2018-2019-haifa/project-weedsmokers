@@ -12,39 +12,28 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 {
 	MeshModel::normals = normals;
 	MeshModel::modelName = modelName;
-	int NumVertices = vertices.size(),i;
+	int NumVertices = vertices.size(),i,j;
 	 MeshModel::vertices = vertices;
-	double min_x = MeshModel::vertices[0][0], min_y = MeshModel::vertices[0][1], min_z = MeshModel::vertices[0][2], max_x = MeshModel::vertices[0][0], max_y = MeshModel::vertices[0][1], max_z = MeshModel::vertices[0][2];
+	 double min[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
+	 double max[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
 	for (i = 1; i < NumVertices; i++) {
-		if (MeshModel::vertices[i][0] < min_x) min_x = MeshModel::vertices[i][0];
-		if (MeshModel::vertices[i][1] < min_y) min_y = MeshModel::vertices[i][1];
-		if (MeshModel::vertices[i][2] < min_z) min_z = MeshModel::vertices[i][2];
-		if (MeshModel::vertices[i][0] > max_x) max_x = MeshModel::vertices[i][0];
-		if (MeshModel::vertices[i][1] > max_y) max_y = MeshModel::vertices[i][1];
-		if (MeshModel::vertices[i][2] > max_z) max_z = MeshModel::vertices[i][2];
-	}
-	if (min_x < 0) {
-		for (i = 0; i < NumVertices; i++) {
-			MeshModel::vertices[i][0] -= min_x;
-			max_x -= min_x;
+		for (j = 0; j < 3; j++) {
+			if (MeshModel::vertices[i][j] < min[j]) min[j] = MeshModel::vertices[i][j];
+			if (MeshModel::vertices[i][j] > max[j]) max[j] = MeshModel::vertices[i][j];
 		}
 	}
-	if (min_y < 0) {
-		for (i = 0; i < NumVertices; i++) {
-			MeshModel::vertices[i][1] -= min_y;
-			max_y -= min_y;
-		}
-	}
-	if (min_z < 0) {
-		for (i = 0; i < NumVertices; i++) {
-			MeshModel::vertices[i][2] -= min_z;
-			max_z -= min_z;
+	for (i = 1; i < NumVertices; i++) {
+		for (j = 0; j < 3; j++) {
+			if (min[j] < 0) {
+				MeshModel::vertices[i][j] -= min[j];
+				max[j] -= min[j];
+			}
 		}
 	}
 	for (i = 0; i < NumVertices; i++) {
-		MeshModel::vertices[i][0] = MeshModel::vertices[i][0] / max_x * 1280;
-		MeshModel::vertices[i][1] = MeshModel::vertices[i][1] / max_y * 720;
-		MeshModel::vertices[i][2] = MeshModel::vertices[i][2] / max_z;
+		MeshModel::vertices[i][0] = MeshModel::vertices[i][0] / max[0] * 1280;
+		MeshModel::vertices[i][1] = MeshModel::vertices[i][1] / max[1] * 720;
+		MeshModel::vertices[i][2] = MeshModel::vertices[i][2] / max[2];
 	}
 }
 
