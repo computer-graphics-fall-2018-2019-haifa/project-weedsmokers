@@ -77,10 +77,13 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 void Renderer::Render(const Scene& scene)
 {
 	glm::vec2 p0, p1;
-	p0.x = 0.0;
-	p0.y = 0.0;
+	p0.x = 0;
+	p0.y = 0;
 	p1.x = 1;
 	p1.y = 1;
+
+
+	MeshModel model = scene.GetActiveModel();
 	//#############################################
 	//## You should override this implementation ##
 	//## Here you should render the scene.       ##
@@ -226,12 +229,12 @@ void Renderer::drawLine(const glm::vec2& p0, const glm::vec2& p1)
 {
 	
 	
-	if (std::abs(p1.y - p0.y)  < std::abs(p1.x - p0.x))
+	if (std::abs(p1.y - p0.y)  <= std::abs(p1.x - p0.x))
 	{ // line slope is less than 1
 		if (p0.x > p1.x)
-			drawLineLow(p0, p1);
-		else
 			drawLineLow(p1, p0);
+		else
+			drawLineLow(p0, p1);
 	}
 	else
 	{	// Line slope is greater/equal one
@@ -295,7 +298,7 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 	temp_p0.y = ReScaleY(p0.y);
 	temp_p1.x = ReScaleX(p1.x);
 	temp_p1.y = ReScaleY(p1.y);
-	
+		
 
 	
 
@@ -317,7 +320,7 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 	for (y = temp_p0.y; y <= temp_p1.y; y++)
 	{
 	//	std::cout << "x=" << x << " y=" << y << std::endl;
-		putPixel(x, y, color);
+		putPixel2(x, y, color);
 		if (D > 0)
 		{
 			x = x + sign;
@@ -327,9 +330,6 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 		D = D + 2 * temp.x;
 	}
 }
-
-
-
 
 void Renderer::drawTriangles(const std::vector<glm::vec3>*  points, const glm::vec3* normals)
 {
@@ -360,7 +360,7 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>*  points, const glm::v
 
 int	Renderer::ReScaleX(float num)
 {
-	return num * viewportWidth;
+	return num * viewportWidth ;
 }
 
 int	Renderer::ReScaleY(float num)
@@ -368,5 +368,13 @@ int	Renderer::ReScaleY(float num)
 	return num * viewportHeight;
 }
 
+void Renderer::putPixel2(int i, int j, const glm::vec3& color)
+{
+	if (i < 0) return; if (i >= viewportWidth) return;
+	if (j < 0) return; if (j >= viewportHeight) return;
 
-
+	//std::cout << "i=" << i << " j=" << j << std::endl;
+	colorBuffer[INDEX(viewportWidth, i, j, 0)] = color.x;
+	colorBuffer[INDEX(viewportWidth, i, j, 1)] = color.y;
+	colorBuffer[INDEX(viewportWidth, i, j, 2)] = color.z;
+}

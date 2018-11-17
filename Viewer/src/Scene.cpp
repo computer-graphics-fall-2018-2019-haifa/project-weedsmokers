@@ -56,3 +56,12 @@ const int Scene::GetActiveModelIndex() const
 {
 	return activeModelIndex;
 }
+
+ MeshModel Scene::GetActiveModel() const
+{
+	
+	
+		return *models[GetActiveModelIndex()];
+	
+	 
+}

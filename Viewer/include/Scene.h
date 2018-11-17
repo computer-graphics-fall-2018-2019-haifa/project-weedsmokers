@@ -35,5 +35,6 @@ public:
 	void SetActiveModelIndex(int index);
 	const int GetActiveModelIndex() const;
 
+	  MeshModel GetActiveModel() const ;
 	// Add more methods as needed...
 };

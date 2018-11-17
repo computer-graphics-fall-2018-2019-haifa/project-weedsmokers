@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 	
 
 		RenderFrame(window, scene, renderer, io);
-
+		
 		
 		
 	}

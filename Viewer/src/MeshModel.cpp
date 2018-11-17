@@ -10,9 +10,15 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	modelName(modelName),
 	worldTransform(glm::mat4x4(1))
 {
-	
+	this->faces = faces;
+
+
+
+
+
 
 }
+
 
 MeshModel::~MeshModel()
 {

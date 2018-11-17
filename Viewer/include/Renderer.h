@@ -9,7 +9,7 @@
 /*
  * Renderer class.
  */
-class Renderer
+class Renderer :public Scene
 {
 private:
 	float *colorBuffer;
