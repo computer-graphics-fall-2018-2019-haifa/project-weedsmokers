@@ -81,9 +81,24 @@ void Renderer::Render(const Scene& scene)
 	p0.y = 0;
 	p1.x = 1;
 	p1.y = 1;
+	int i;
 
-
-	MeshModel model = scene.GetActiveModel();
+	if (scene.GetModelCount() > 0)
+	{
+		MeshModel model = scene.GetActiveModel();
+		for (i = 0; i < model.faces.size(); i++)
+		{
+			std::vector<glm::vec3> points;
+			std::vector<glm::vec3> normals;
+			points.push_back(model.vertices[model.faces[i].GetVertexIndex(0)]);
+			points[1] = model.vertices[model.faces[i].GetVertexIndex(1)];
+			points[2] = model.vertices[model.faces[i].GetVertexIndex(2)];
+			normals[0] = model.normals[model.faces[i].GetNormalIndex(0)];
+			normals[1] = model.normals[model.faces[i].GetNormalIndex(1)];
+			normals[2] = model.normals[model.faces[i].GetNormalIndex(2)];
+			drawTriangles(&points, &normals);
+		}
+	}
 	//#############################################
 	//## You should override this implementation ##
 	//## Here you should render the scene.       ##
@@ -331,7 +346,7 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 	}
 }
 
-void Renderer::drawTriangles(const std::vector<glm::vec3>*  points, const glm::vec3* normals)
+void Renderer::drawTriangles(const std::vector<glm::vec3>* points, std::vector<glm::vec3>* normals)
 {
 	glm::vec3* temp;
 	glm::vec3 v1, v2, v3;
@@ -341,7 +356,7 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>*  points, const glm::v
 		v1 = (*points)[i];
 		v2 = (*points)[i + 1];
 		v3 = (*points)[i + 2];
-		
+
 		if (v1.z != 0)
 			v1 = v1 / v1.z;
 		if (v2.z != 0)
@@ -349,14 +364,15 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>*  points, const glm::v
 		if (v3.z != 0)
 			v3 = v3 / v3.z;
 
-		drawLine(v1,v2 );
+		drawLine(v1, v2);
 		drawLine(v2, v3);
 		drawLine(v1, v3);
 
 
 	}
-
 }
+
+
 
 int	Renderer::ReScaleX(float num)
 {

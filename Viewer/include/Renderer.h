@@ -18,7 +18,7 @@ private:
 	int viewportHeight;
 	int viewportX;
 	int viewportY;
-
+	friend class MeshModel;
 	void putPixel(int x, int y, const glm::vec3& color);
 	void createBuffers(int viewportWidth, int viewportHeight);
 
@@ -38,7 +38,7 @@ public:
 	void drawLine(const glm::vec2 & p0, const glm::vec2 & p1);
 	void drawLineLow(const glm::vec2 & p0, const glm::vec2 & p1);
 	void drawLineHight(const glm::vec2 & p0, const glm::vec2 & p1);
-	void drawTriangles(const std::vector<glm::vec3> * points, const glm::vec3 * normals= NULL );
+	void drawTriangles(const std::vector<glm::vec3> * points, std::vector<glm::vec3> * normals= NULL );
 	int ReScaleX(float num);
 	int ReScaleY(float num);
 	void ClearColorBuffer(const glm::vec3& color);

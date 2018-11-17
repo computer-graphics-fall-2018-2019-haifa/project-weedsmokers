@@ -60,8 +60,9 @@ const int Scene::GetActiveModelIndex() const
  MeshModel Scene::GetActiveModel() const
 {
 	
-	
-		return *models[GetActiveModelIndex()];
+	// MeshModel x = *models[GetActiveModelIndex()];
+	 return *models[GetActiveModelIndex()];
+
 	
 	 
 }
