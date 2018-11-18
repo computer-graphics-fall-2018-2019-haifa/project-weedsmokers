@@ -45,10 +45,34 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::ColorEdit3("clear color", (float*)&clearColor); // Edit 3 floats representing a color
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+		if (ImGui::Button("Add camera"))
+		{// Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
+			scene.AddCamera(Camera());
+		}
 		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+		ImGui::Text("Cameras # = %d", counter);
+		static int i1 = 0;
+		ImGui::SliderInt("Choose camera", &i1, 0, scene.GetCameraCount());
+		scene.SetActiveCameraIndex(i1);
+
+		static float scaleX = 1;
+		ImGui::SliderFloat("scaleX", &scaleX, 0.01, 10);
+		static float scaleY = 1;
+		ImGui::SliderFloat("scaleY", &scaleY, 0.01, 10);
+		scene.ScaleActiveModel(scaleX, scaleY);
+
+		static float TranslateX = 0;
+		ImGui::SliderFloat("TranslateX", &TranslateX, 0, 1);
+		static float TranslateY = 0;
+		ImGui::SliderFloat("TranslateY", &TranslateY, 0, 1);
+		scene.TranslateActiveModel(TranslateX, TranslateY);
+
+		static float deg = 0;
+		ImGui::SliderFloat("Rotate", &deg,-90, 90);
+		scene.RotateActiveModel(deg);
+
+		
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

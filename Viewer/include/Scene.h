@@ -34,7 +34,9 @@ public:
 
 	void SetActiveModelIndex(int index);
 	const int GetActiveModelIndex() const;
-
+	void ScaleActiveModel(float scaleX, float scaleY);
+	void TranslateActiveModel(float x, float y);
+	void RotateActiveModel(float a);
 	  MeshModel GetActiveModel() const ;
 	// Add more methods as needed...
 };

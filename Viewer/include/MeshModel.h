@@ -19,6 +19,11 @@ private:
 	glm::vec4 color;
 	std::string modelName;
 	friend class Renderer;
+	float scaleX;
+	float scaleY;
+	float TranslateX;
+	float TranslateY;
+	float deg;
 public:
 	MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName = "");
 	
@@ -32,6 +37,8 @@ public:
 
 	const std::string& GetModelName();
 
-
+	void SetScale(float scaleX, float scaleY);
+	void Translate(float x, float y);
+	void Rotate(float a);
 	// Add more methods/functionality as needed...
 };

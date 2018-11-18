@@ -9,6 +9,8 @@ Scene::Scene() :
 
 }
 
+
+
 void Scene::AddModel(const std::shared_ptr<MeshModel>& model)
 {
 	models.push_back(model);
@@ -57,10 +59,31 @@ const int Scene::GetActiveModelIndex() const
 	return activeModelIndex;
 }
 
- MeshModel Scene::GetActiveModel() const
+void Scene::ScaleActiveModel(float scaleX, float scaleY)
+{	if(GetModelCount())
+		models[GetActiveModelIndex()]->SetScale(scaleX, scaleY);
+}
+
+void Scene::TranslateActiveModel(float x, float y)
+{
+	if (GetModelCount())
+		models[GetActiveModelIndex()]->Translate(x, y);
+}
+
+
+
+
+
+void Scene::RotateActiveModel(float a)
+{
+	if (GetModelCount())
+		models[GetActiveModelIndex()]->Rotate(a);
+}
+
+MeshModel Scene::GetActiveModel() const
 {
 	
-	// MeshModel x = *models[GetActiveModelIndex()];
+	
 	 return *models[GetActiveModelIndex()];
 
 	

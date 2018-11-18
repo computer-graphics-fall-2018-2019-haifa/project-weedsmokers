@@ -63,11 +63,11 @@ int main(int argc, char **argv)
 
 	// Setup ImGui
 	ImGuiIO& io = SetupDearImgui(window);
-
-	// Register a mouse scroll-wheel callback
+	//	ImGuiIO& io2= SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
-
-	renderer.drawLine(p0, p1);
+	Camera c;
+	
+	
 	// This is the main game loop..
 	while (!glfwWindowShouldClose(window))
 	{

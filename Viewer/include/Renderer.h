@@ -43,7 +43,7 @@ public:
 	int ReScaleY(float num);
 	void ClearColorBuffer(const glm::vec3& color);
 	void SetViewport(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
-
+	void drawActiveModel(const Scene& scene);
 
 	void putPixel2(int i, int j, const glm::vec3& color);
 

@@ -74,15 +74,9 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 	createOpenGLBuffer();
 }
 
-void Renderer::Render(const Scene& scene)
+void Renderer::drawActiveModel(const Scene & scene)
 {
-	glm::vec2 p0, p1;
-	p0.x = 0;
-	p0.y = 0;
-	p1.x = 1;
-	p1.y = 1;
 	int i;
-
 	if (scene.GetModelCount() > 0)
 	{
 		MeshModel model = scene.GetActiveModel();
@@ -90,22 +84,49 @@ void Renderer::Render(const Scene& scene)
 		{
 			std::vector<glm::vec3> points;
 			std::vector<glm::vec3> normals;
-			points.push_back(model.vertices[model.faces[i].GetVertexIndex(0)]);
-			points[1] = model.vertices[model.faces[i].GetVertexIndex(1)];
-			points[2] = model.vertices[model.faces[i].GetVertexIndex(2)];
-			normals[0] = model.normals[model.faces[i].GetNormalIndex(0)];
-			normals[1] = model.normals[model.faces[i].GetNormalIndex(1)];
-			normals[2] = model.normals[model.faces[i].GetNormalIndex(2)];
-			drawTriangles(&points, &normals);
+
+			glm::vec3 p = model.vertices[(model.faces[i].GetVertexIndex(0)) - 1];
+			glm::vec4 new_p = { p.x,p.y,p.z,1};
+			glm::mat4x4 A = model.GetWorldTransformation();
+			glm::vec4 transformed_p = { 0,0,0,0 };
+			transformed_p = A * new_p;
+
+			points.push_back(transformed_p);
+			transformed_p = { 0,0,0,0 };
+			p = model.vertices[(model.faces[i].GetVertexIndex(1)) - 1];
+			new_p = { p.x,p.y,p.z,1 };
+			
+			transformed_p =  A * new_p;
+			points.push_back(transformed_p);
+			transformed_p = { 0,0,0,0 };
+			p = model.vertices[(model.faces[i].GetVertexIndex(2)) - 1];
+			new_p = { p.x,p.y,p.z,1 };
+			transformed_p = A * new_p;
+			points.push_back(transformed_p);
+
+			drawTriangles(&points);
 		}
 	}
+}
+
+void Renderer::Render(const Scene& scene)
+{
+	
+	glm::vec2 p0, p1;
+	p0.x = 0;
+	p0.y = 0;
+	p1.x = 0.3;
+	p1.y = 0.2;
+	int i;
+
+	
 	//#############################################
 	//## You should override this implementation ##
 	//## Here you should render the scene.       ##
 	//#############################################
 
 	// Draw a chess board in the middle of the screen
-	for (int i = 100; i < viewportWidth - 100; i++)
+	/*for (int i = 100; i < viewportWidth - 100; i++)
 	{
 		for (int j = 100; j < viewportHeight - 100; j++)
 		{
@@ -122,7 +143,8 @@ void Renderer::Render(const Scene& scene)
 				putPixel(i, j, glm::vec3(1, 0, 0));
 			}
 		}
-	}
+	}*/
+	drawActiveModel(scene);
 	drawLine(p0, p1);
 }
 
@@ -244,7 +266,7 @@ void Renderer::drawLine(const glm::vec2& p0, const glm::vec2& p1)
 {
 	
 	
-	if (std::abs(p1.y - p0.y)  <= std::abs(p1.x - p0.x))
+/*	if (std::abs(p1.y - p0.y)  <= std::abs(p1.x - p0.x))
 	{ // line slope is less than 1
 		if (p0.x > p1.x)
 			drawLineLow(p1, p0);
@@ -252,33 +274,86 @@ void Renderer::drawLine(const glm::vec2& p0, const glm::vec2& p1)
 			drawLineLow(p0, p1);
 	}
 	else
-	{	// Line slope is greater/equal one
+	{	// line slope is greater than 1
 		if(p0.y > p1.y)
 			drawLineHight(p1, p0);
 		else
 			drawLineHight(p0, p1);
 
+	}*/
+
+
+	// Bresenham's line algorithm
+	const bool steep = (std::abs(p1.y - p0.y) > std::abs(p1.x - p0.x));
+	glm::vec3 color;
+	color = { 100,100,100 };
+	glm::vec2 temp_p0 = p0, temp_p1 = p1;
+	temp_p0.x = ReScaleX(p0.x);
+	temp_p0.y = ReScaleY(p0.y);
+	temp_p1.x = ReScaleX(p1.x);
+	temp_p1.y = ReScaleY(p1.y);
+	if (steep)
+	{
+		std::swap(temp_p0.x, temp_p0.y);
+		std::swap(temp_p1.x, temp_p1.y);
+	}
+	
+
+	if (temp_p0.x > temp_p1.x)
+	{
+		std::swap(temp_p0.x, temp_p1.x);
+		std::swap(temp_p0.y, temp_p1.y);
 	}
 
+	const float dx = temp_p1.x - temp_p0.x;
+	const float dy = fabs(temp_p1.y - temp_p0.y);
+
+	float error = dx / 2.0f;
+	const int ystep = (temp_p0.y < temp_p1.y) ? 1 : -1;
+	int y = (int)temp_p0.y;
+
+	const int maxX = (int)temp_p1.x;
+
+	for (int x = (int)temp_p0.x; x < maxX; x++)
+	{
+		if (steep)
+		{
+			putPixel(y, x, color);
+		}
+		else
+		{
+			putPixel(x, y, color);
+		}
+
+		error -= dy;
+		if (error < 0)
+		{
+			y += ystep;
+			error += dx;
+		}
+	}
+	
+	
 
 
 }
 
 void Renderer::drawLineLow(const glm::vec2& p0, const glm::vec2& p1)
 {
+	
 	glm::vec2 temp_p0=p0, temp_p1=p1;
 	temp_p0.x = ReScaleX(p0.x);
 	temp_p0.y = ReScaleY(p0.y);
 	temp_p1.x = ReScaleX(p1.x);
 	temp_p1.y = ReScaleY(p1.y);
-
+	//std::cout << " p0:" << temp_p0.x << "     " << temp_p0.y << std::endl;
 	glm::vec3 color;
 	int D,x,y,sign = 1;
 	glm::vec2 temp;
 	temp = temp_p1 - temp_p0;
-	color.x = 100;
-	color.y = 200;
-	color.z = 150;
+	color.x = 0;
+	color.y = 0;
+	color.z = 0;
 
 	if (temp.y < 0)
 	{
@@ -313,16 +388,16 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 	temp_p0.y = ReScaleY(p0.y);
 	temp_p1.x = ReScaleX(p1.x);
 	temp_p1.y = ReScaleY(p1.y);
-		
-
+	std::cout << " p0:" << temp_p0.x << "     " << temp_p0.y << std::endl;
+	std::cout << " p1:" << temp_p1.x << "     " << temp_p1.y << std::endl;
 	
 
 	int D, x, y, sign = 1;
 	glm::vec2 temp;
 	temp = temp_p1 - temp_p0;
-	color.x = 0;
+	color.x = 200;
 	color.y = 0;
-	color.z = 0;
+	color.z =  0;
 
 	if (temp.x < 0)
 	{
@@ -334,8 +409,8 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 	x = temp_p0.x;
 	for (y = temp_p0.y; y <= temp_p1.y; y++)
 	{
-	//	std::cout << "x=" << x << " y=" << y << std::endl;
-		putPixel2(x, y, color);
+		std::cout << "x=" << x << " y=" << y << std::endl;
+		putPixel(x, y, color);
 		if (D > 0)
 		{
 			x = x + sign;
@@ -351,18 +426,19 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, std::vector<g
 	glm::vec3* temp;
 	glm::vec3 v1, v2, v3;
 	int i;
-	for (i = 0; i < points->size(); i++)
+	for (i = 0; i < points->size(); i=i+3)
 	{
 		v1 = (*points)[i];
-		v2 = (*points)[i + 1];
-		v3 = (*points)[i + 2];
-
-		if (v1.z != 0)
+		v2 = (*points)[i+1];
+		v3 = (*points)[i+2];
+		//std::cout << "p1:" << v1.x << "   "  << v1.y << "     " <<  v1.z << std::endl;
+		//std::cout << "p2:" << v2.x << "   " << v2.y << "     " << v2.z << std::endl;
+		/*if (v1.z != 0)
 			v1 = v1 / v1.z;
 		if (v2.z != 0)
 			v2 = v2 / v2.z;
 		if (v3.z != 0)
-			v3 = v3 / v3.z;
+			v3 = v3 / v3.z;*/
 
 		drawLine(v1, v2);
 		drawLine(v2, v3);
