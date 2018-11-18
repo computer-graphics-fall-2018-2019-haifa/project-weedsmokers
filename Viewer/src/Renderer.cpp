@@ -459,6 +459,7 @@ int	Renderer::ReScaleY(float num)
 {
 	return num * viewportHeight;
 }
+<<<<<<< HEAD
 
 void Renderer::putPixel2(int i, int j, const glm::vec3& color)
 {
@@ -470,3 +471,5 @@ void Renderer::putPixel2(int i, int j, const glm::vec3& color)
 	colorBuffer[INDEX(viewportWidth, i, j, 1)] = color.y;
 	colorBuffer[INDEX(viewportWidth, i, j, 2)] = color.z;
 }
+=======
+>>>>>>> c30a5e23d5f041a0efaba9ff9d68c6373c313ebd
