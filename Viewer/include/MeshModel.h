@@ -9,7 +9,7 @@
  * This class represents a mesh model (with faces and normals informations).
  * You can use Utils::LoadMeshModel to create instances of this class from .obj files.
  */
-class MeshModel
+class MeshModel 
 {
 private:
 	std::vector<Face> faces;
@@ -23,7 +23,8 @@ private:
 	float scaleY;
 	float TranslateX;
 	float TranslateY;
-	float deg;
+	float Aroundx, AroundY, AroundZ;
+	std::vector<glm::vec3> Box;
 public:
 
 	MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName = "");
@@ -40,6 +41,6 @@ public:
 
 	void SetScale(float scaleX, float scaleY);
 	void Translate(float x, float y);
-	void Rotate(float a);
+	void Rotate(float AroundX,float AroundY,float AroundZ);
 	// Add more methods/functionality as needed...
 };

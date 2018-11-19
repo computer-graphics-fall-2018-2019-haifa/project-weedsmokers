@@ -74,12 +74,18 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 	createOpenGLBuffer();
 }
 
-void Renderer::drawActiveModel(const Scene & scene)
+void Renderer::drawActiveModel(const Scene & scene, bool drawNormals,bool drawFacesNormals,bool Box)
 {
-	int i;
+	glm::vec4 p1, p2,p3;
+	int i,j,k;
 	if (scene.GetModelCount() > 0)
 	{
 		MeshModel model = scene.GetActiveModel();
+		glm::mat4x4 A = model.GetWorldTransformation();	
+		Camera camera;
+		if (scene.GetCameraCount())
+			camera = scene.GetActiveCamera();
+		glm::mat4x4 C = camera.getviewTransformation();
 		for (i = 0; i < model.faces.size(); i++)
 		{
 			std::vector<glm::vec3> points;
@@ -87,24 +93,65 @@ void Renderer::drawActiveModel(const Scene & scene)
 
 			glm::vec3 p = model.vertices[(model.faces[i].GetVertexIndex(0)) - 1];
 			glm::vec4 new_p = { p.x,p.y,p.z,1};
-			glm::mat4x4 A = model.GetWorldTransformation();
+			 A = model.GetWorldTransformation();
 			glm::vec4 transformed_p = { 0,0,0,0 };
-			transformed_p = A * new_p;
+			transformed_p = C*A * new_p;
 
 			points.push_back(transformed_p);
 			transformed_p = { 0,0,0,0 };
 			p = model.vertices[(model.faces[i].GetVertexIndex(1)) - 1];
 			new_p = { p.x,p.y,p.z,1 };
 			
-			transformed_p =  A * new_p;
+			transformed_p =  C*A * new_p;
 			points.push_back(transformed_p);
 			transformed_p = { 0,0,0,0 };
 			p = model.vertices[(model.faces[i].GetVertexIndex(2)) - 1];
 			new_p = { p.x,p.y,p.z,1 };
-			transformed_p = A * new_p;
+			transformed_p =C* A * new_p;
 			points.push_back(transformed_p);
+			drawTriangles(&points, drawFacesNormals);
+		}
 
-			drawTriangles(&points);
+		
+		if (drawNormals)
+		{
+			for (i = 0; i < model.faces.size(); i++)
+				for (j = 0; j < model.faces[i].getNormalsNum(); j++)
+				{
+					int k = model.faces[i].GetNormalIndex(j);
+					int t = model.faces[i].GetVertexIndex(j);
+					p1 = { model.normals[model.faces[i].GetNormalIndex(j) - 1],1 };
+					p2 = { model.vertices[model.faces[i].GetVertexIndex(j) - 1],1 };
+
+					p1.x /= viewportWidth;
+					p1.y /= viewportHeight;
+					p3 = p1 + p2;
+					drawLine((A*p3), (A*p2));
+				}
+		}
+		if (Box)
+		{
+			glm::vec4 p1 = { 0,1,1,1 };
+			glm::vec4 p2 = {1,1,1,1};
+			p1 = A * p1;
+			p2 = A * p2;
+			drawLine(p1, p2);
+			p1 = { 1,1,1,1 };
+			p2 = { 1,0,1,1 };
+			p1 = A * p1;
+			p2 = A * p2;
+			drawLine(p1, p2);
+			p1 = { 1,0,1,1 };
+			p2 = { 0,0,1,1 };
+			p1 = A * p1;
+			p2 = A * p2;
+			drawLine(p1, p2);
+			p1 = { 0, 0, 1, 1 };
+			p2 = { 0,1,1,1 };
+			p1 = A * p1;
+			p2 = A * p2;
+			drawLine(p1, p2);
+
 		}
 	}
 }
@@ -112,12 +159,7 @@ void Renderer::drawActiveModel(const Scene & scene)
 void Renderer::Render(const Scene& scene)
 {
 	
-	glm::vec2 p0, p1;
-	p0.x = 0;
-	p0.y = 0;
-	p1.x = 0.3;
-	p1.y = 0.2;
-	int i;
+
 
 	
 	//#############################################
@@ -144,8 +186,7 @@ void Renderer::Render(const Scene& scene)
 			}
 		}
 	}*/
-	drawActiveModel(scene);
-	drawLine(p0, p1);
+	drawActiveModel(scene, scene.getdrawNormals(),scene.getdrawFacesNormals(),scene.getdrawBox());
 }
 
 //##############################
@@ -421,7 +462,7 @@ void Renderer::drawLineHight(const glm::vec2& p0, const glm::vec2& p1)
 	}
 }
 
-void Renderer::drawTriangles(const std::vector<glm::vec3>* points, std::vector<glm::vec3>* normals)
+void Renderer::drawTriangles(const std::vector<glm::vec3>* points, bool drawFacesNormals)
 {
 	glm::vec3* temp;
 	glm::vec3 v1, v2, v3;
@@ -443,6 +484,16 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, std::vector<g
 		drawLine(v1, v2);
 		drawLine(v2, v3);
 		drawLine(v1, v3);
+		if (drawFacesNormals)
+		{
+			glm::vec3 Dir = cross((v2 - v1), (v3 - v1));
+			Dir = normalize(Dir);
+			glm::vec3 center = { (v1[0] + v2[0] + v3[0]) / 3,(v1[1] + v2[1] + v3[1]) / 3,(v1[2] + v2[2] + v3[2]) / 3 };
+			Dir.x /= viewportWidth;
+			Dir.y /= viewportHeight;
+			drawLine(center, center + Dir);
+
+		}
 
 
 	}
@@ -459,7 +510,7 @@ int	Renderer::ReScaleY(float num)
 {
 	return num * viewportHeight;
 }
-<<<<<<< HEAD
+
 
 void Renderer::putPixel2(int i, int j, const glm::vec3& color)
 {
@@ -471,5 +522,4 @@ void Renderer::putPixel2(int i, int j, const glm::vec3& color)
 	colorBuffer[INDEX(viewportWidth, i, j, 1)] = color.y;
 	colorBuffer[INDEX(viewportWidth, i, j, 2)] = color.z;
 }
-=======
->>>>>>> c30a5e23d5f041a0efaba9ff9d68c6373c313ebd
+

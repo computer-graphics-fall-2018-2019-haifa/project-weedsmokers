@@ -56,3 +56,8 @@ const int Face::GetTextureIndex(int index)
 {
 	return textureIndices[index];
 }
+
+int Face::getNormalsNum()
+{
+	return normalIndices.size();
+}

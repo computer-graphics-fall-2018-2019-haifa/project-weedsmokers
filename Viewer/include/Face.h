@@ -17,4 +17,5 @@ public:
 	const int Face::GetVertexIndex(int index);
 	const int Face::GetNormalIndex(int index);
 	const int Face::GetTextureIndex(int index);
+	int Face::getNormalsNum();
 };

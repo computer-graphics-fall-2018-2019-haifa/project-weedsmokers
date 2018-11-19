@@ -12,10 +12,14 @@
 #include <stdlib.h>
 #include <nfd.h>
 #include <random>
-
+float AroundX = 0;
+float AroundY = 0;
+float AroundZ = 0;
 bool showDemoWindow = false;
 bool showAnotherWindow = false;
-
+bool drawNormals = false;
+bool drawFacesNormals = false;
+bool Box;
 glm::vec4 clearColor = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
 
 const glm::vec4& GetClearColor()
@@ -68,11 +72,23 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::SliderFloat("TranslateY", &TranslateY, 0, 1);
 		scene.TranslateActiveModel(TranslateX, TranslateY);
 
-		static float deg = 0;
-		ImGui::SliderFloat("Rotate", &deg,-90, 90);
-		scene.RotateActiveModel(deg);
 
-		
+		//ImGui::Checkbox("Around X", &AroundX);
+		//ImGui::Checkbox("Around Y", &AroundY);
+		//ImGui::Checkbox("Around Z", &AroundZ);
+		ImGui::SliderFloat("RoateAroundX", &AroundX, -1.57, 1.57);
+		ImGui::SliderFloat("RotateAroundY", &AroundY, -1.57, 1.57);
+		ImGui::SliderFloat("RotateAroundZ", &AroundZ, -1.57, 1.57);
+		scene.RotateActiveModel( AroundX, AroundY, AroundZ);
+
+		ImGui::Checkbox("Draw Normals", &drawNormals);
+		scene.SetdrawNormals(drawNormals);
+
+		ImGui::Checkbox("Draw Faces Normals", &drawFacesNormals);
+		scene.SetdrawFacesNormals(drawFacesNormals);
+
+		ImGui::Checkbox("Draw Box", &Box);
+		scene.SetdrawBox(Box);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

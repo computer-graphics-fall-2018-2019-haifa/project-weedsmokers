@@ -16,10 +16,11 @@ class Scene {
 private:
 	std::vector<std::shared_ptr<MeshModel>> models;
 	std::vector<Camera> cameras;
-
+	bool drawNormals = false;
 	int activeCameraIndex;
 	int activeModelIndex;
-
+	bool drawFacesNormals = false;
+	bool Box = false;
 public:
 	Scene();
 
@@ -36,7 +37,14 @@ public:
 	const int GetActiveModelIndex() const;
 	void ScaleActiveModel(float scaleX, float scaleY);
 	void TranslateActiveModel(float x, float y);
-	void RotateActiveModel(float a);
+	void RotateActiveModel( float AroundX, float AroundY, float AroundZ);
 	  MeshModel GetActiveModel() const ;
+	  Camera GetActiveCamera() const;
+	  void SetdrawNormals(bool drawNormals);
+	  bool getdrawNormals() const;
+	  void SetdrawFacesNormals(bool drawFacesNormals);
+	  bool getdrawFacesNormals() const;
+	  void SetdrawBox(bool Box);
+	  bool getdrawBox() const;
 	// Add more methods as needed...
 };

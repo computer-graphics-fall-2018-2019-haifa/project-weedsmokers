@@ -73,3 +73,8 @@ void Camera::SetZoom(const float zoom)
 
 
 }
+
+glm::mat4x4 Camera::getviewTransformation()
+{
+	return viewTransformation;
+}

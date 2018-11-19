@@ -74,10 +74,10 @@ void Scene::TranslateActiveModel(float x, float y)
 
 
 
-void Scene::RotateActiveModel(float a)
+void Scene::RotateActiveModel( float AroundX, float AroundY, float AroundZ)
 {
 	if (GetModelCount())
-		models[GetActiveModelIndex()]->Rotate(a);
+		models[GetActiveModelIndex()]->Rotate( AroundX, AroundY, AroundZ);
 }
 
 MeshModel Scene::GetActiveModel() const
@@ -89,3 +89,43 @@ MeshModel Scene::GetActiveModel() const
 	
 	 
 }
+
+Camera Scene::GetActiveCamera() const
+{
+	return  cameras[GetActiveCameraIndex()];;
+}
+
+void Scene::SetdrawNormals(bool drawNormals)
+{
+	this->drawNormals = drawNormals;
+
+}
+
+bool Scene::getdrawNormals() const
+{
+	return drawNormals;
+
+}
+
+void Scene::SetdrawFacesNormals(bool drawFacesNormals) 
+{
+	this->drawFacesNormals = drawFacesNormals;
+
+}
+
+bool Scene::getdrawFacesNormals() const
+{
+	return drawFacesNormals;
+}
+
+void Scene::SetdrawBox(bool Box)
+{
+	this->Box = Box;
+
+}
+
+bool Scene::getdrawBox() const
+{
+	return Box;
+}
+

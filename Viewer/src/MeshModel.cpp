@@ -12,16 +12,18 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	modelName(modelName),
 	worldTransform(glm::mat4x4(1))
 {
-<<<<<<< HEAD
+	Aroundx = 0;
+	AroundY = 0;
+	AroundZ = 0;
 	scaleX = 1;
 	scaleY = 1;
 	TranslateX = 0;
 	TranslateY = 0;
-	deg = 0;
 	MeshModel::faces = faces;
 	MeshModel::normals = normals;
 	MeshModel::modelName = modelName;
 	int NumVertices = vertices.size(), i, j;
+	int NumNormals = normals.size();
 	MeshModel::vertices = vertices;
 
 	double min[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
@@ -34,15 +36,6 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 		}
 	}*/
 
-
-=======
-	MeshModel::normals = normals;
-	MeshModel::modelName = modelName;
-	int NumVertices = vertices.size(),i,j;
-	 MeshModel::vertices = vertices;
-	 double min[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
-	 double max[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
->>>>>>> c30a5e23d5f041a0efaba9ff9d68c6373c313ebd
 	for (i = 1; i < NumVertices; i++) {
 		for (j = 0; j < 3; j++) {
 			if (MeshModel::vertices[i][j] < min[j]) min[j] = MeshModel::vertices[i][j];
@@ -52,41 +45,67 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	for (i = 1; i < NumVertices; i++) {
 		for (j = 0; j < 3; j++) {
 			if (min[j] < 0) {
-<<<<<<< HEAD
+
 				MeshModel::vertices[i][j] -= min[j];				
 			}
 		}
 	}
-
 	for (j = 0; j < 3; j++)
 		max[j] -= min[j];
 	for (i = 0; i < NumVertices; i++) {
-		MeshModel::vertices[i][0] = (MeshModel::vertices[i][0] / max[0])*0.8;
-		MeshModel::vertices[i][1] = (MeshModel::vertices[i][1] / max[1])*0.8;
-		MeshModel::vertices[i][2] = (MeshModel::vertices[i][2] / max[2])*0.8;
+		MeshModel::vertices[i][0] = (MeshModel::vertices[i][0] / max[0]);
+		MeshModel::vertices[i][1] = (MeshModel::vertices[i][1] / max[1]);
+		MeshModel::vertices[i][2] = (MeshModel::vertices[i][2] / max[2]);
 	}
 
+	
+	Box.push_back({ min[0],max[1],1 });
+	Box.push_back({ max[0],max[1],1 });
+	Box.push_back({ min[0],min[1],1 });
+	Box.push_back({ max[0],min[1],1 });
+
+	
+	/*min[0] = MeshModel::normals[0][0];
+	min[1] = MeshModel::normals[0][1];
+	min[2] = MeshModel::normals[0][2];
+	max[0] =  MeshModel::normals[0][0];
+	max[1] = MeshModel::normals[0][1];
+	max[2] = MeshModel::normals[0][2];
 
 
 
+	for (i = 1; i < NumNormals; i++) {
+		for (j = 0; j < 3; j++) {
+			if (MeshModel::normals[i][j] < min[j]) min[j] = MeshModel::normals[i][j];
+			if (MeshModel::normals[i][j] > max[j]) max[j] = MeshModel::normals[i][j];
+		}
+	}
+	for (i = 1; i < NumNormals; i++) {
+		for (j = 0; j < 3; j++) {
+			if (min[j] < 0) {
 
-
-
-
-
-
-=======
-				MeshModel::vertices[i][j] -= min[j];
-				max[j] -= min[j];
+				MeshModel::normals[i][j] -= min[j];
 			}
 		}
 	}
-	for (i = 0; i < NumVertices; i++) {
-		MeshModel::vertices[i][0] = MeshModel::vertices[i][0] / max[0] * 1280;
-		MeshModel::vertices[i][1] = MeshModel::vertices[i][1] / max[1] * 720;
-		MeshModel::vertices[i][2] = MeshModel::vertices[i][2] / max[2];
-	}
->>>>>>> c30a5e23d5f041a0efaba9ff9d68c6373c313ebd
+	for (j = 0; j < 3; j++)
+		max[j] -= min[j];*/
+
+/*
+	for (i = 0; i < NumNormals; i++) {
+		MeshModel::normals[i][0] = (MeshModel::normals[i][0] / max[0]);
+		MeshModel::normals[i][1] = (MeshModel::normals[i][1] / max[1]);
+		MeshModel::normals[i][2] = (MeshModel::normals[i][2] / max[2]);
+	}*/
+
+
+
+
+
+
+
+
+
 }
 
 
@@ -102,9 +121,13 @@ void MeshModel::SetWorldTransformation(const glm::mat4x4& worldTransform)
 
 const glm::mat4x4& MeshModel::GetWorldTransformation() const
 {
+
 	glm::mat4x4 A= worldTransform;
 	A = glm::translate(A, glm::vec3(TranslateX, TranslateY, 1));
-	A =  glm::rotate(A, deg, { 1,1,1 });
+	//A = glm::rotate(A, deg, { Aroundx, AroundY, AroundZ });
+	A = glm::rotate(A, Aroundx, { 1, 0, 0 });
+	A = glm::rotate(A, AroundY, { 0, 1, 0 });
+	A = glm::rotate(A, AroundZ, { 0, 0, 1 });
 	A =  glm::scale(A, glm::vec3(scaleX, scaleY, 1));
 	//return worldTransform;
 	return  A;
@@ -144,8 +167,12 @@ void MeshModel::Translate(float x, float y)
 	//worldTransform = glm::translate(worldTransform, glm::vec3(scaleX, scaleY, 1));
 }
 
-void MeshModel::Rotate(float a)
+void MeshModel::Rotate(float AroundX,float AroundY,float AroundZ)
 {
-	this->deg = a;
+
+	this->Aroundx = AroundX;
+	this->AroundY = AroundY;
+	this->AroundZ = AroundZ;
+
 	//worldTransform = glm::rotate(worldTransform, a, { 1,1,1 });
 }

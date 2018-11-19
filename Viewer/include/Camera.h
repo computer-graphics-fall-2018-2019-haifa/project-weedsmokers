@@ -39,5 +39,6 @@ public:
 
 	void SetZoom(const float zoom);
 
+	glm::mat4x4 getviewTransformation();
 	// Add more methods/functionality as needed...
 };

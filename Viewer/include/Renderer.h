@@ -38,12 +38,12 @@ public:
 	void drawLine(const glm::vec2 & p0, const glm::vec2 & p1);
 	void drawLineLow(const glm::vec2 & p0, const glm::vec2 & p1);
 	void drawLineHight(const glm::vec2 & p0, const glm::vec2 & p1);
-	void drawTriangles(const std::vector<glm::vec3> * points, std::vector<glm::vec3> * normals= NULL );
+	void drawTriangles(const std::vector<glm::vec3> * points, bool drawFacesNormals = false);
 	int ReScaleX(float num);
 	int ReScaleY(float num);
 	void ClearColorBuffer(const glm::vec3& color);
 	void SetViewport(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
-	void drawActiveModel(const Scene& scene);
+	void drawActiveModel(const Scene& scene , bool drawNormals, bool drawFacesNormals,bool Box);
 
 	void putPixel2(int i, int j, const glm::vec3& color);
 
