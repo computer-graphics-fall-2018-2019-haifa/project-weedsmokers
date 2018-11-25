@@ -60,15 +60,15 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::SliderInt("Choose camera", &i1, 0, scene.GetCameraCount());
 		scene.SetActiveCameraIndex(i1);
 
-		static float scaleX = 1;
+		static float scaleX = 0.5;
 		ImGui::SliderFloat("scaleX", &scaleX, 0.01, 10);
-		static float scaleY = 1;
+		static float scaleY = 0.5;
 		ImGui::SliderFloat("scaleY", &scaleY, 0.01, 10);
 		scene.ScaleActiveModel(scaleX, scaleY);
 
-		static float TranslateX = 0;
+		static float TranslateX = 0.3;
 		ImGui::SliderFloat("TranslateX", &TranslateX, 0, 1);
-		static float TranslateY = 0;
+		static float TranslateY = 0.3;
 		ImGui::SliderFloat("TranslateY", &TranslateY, 0, 1);
 		scene.TranslateActiveModel(TranslateX, TranslateY);
 
@@ -89,6 +89,17 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		ImGui::Checkbox("Draw Box", &Box);
 		scene.SetdrawBox(Box);
+
+		if (ImGui::Button("Reset"))
+		{
+			scaleX = 0.5;
+			scaleY = 0.5;
+			TranslateX = 0.3;
+			TranslateY = 0.3;
+			AroundX = 0;
+			AroundY = 0;
+			AroundZ = 0;
+		}
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

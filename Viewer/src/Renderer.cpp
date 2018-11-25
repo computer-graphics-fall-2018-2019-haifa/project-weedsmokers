@@ -118,15 +118,26 @@ void Renderer::drawActiveModel(const Scene & scene, bool drawNormals,bool drawFa
 			for (i = 0; i < model.faces.size(); i++)
 				for (j = 0; j < model.faces[i].getNormalsNum(); j++)
 				{
+					A = model.GetWorldTransformation();
 					int k = model.faces[i].GetNormalIndex(j);
 					int t = model.faces[i].GetVertexIndex(j);
 					p1 = { model.normals[model.faces[i].GetNormalIndex(j) - 1],1 };
 					p2 = { model.vertices[model.faces[i].GetVertexIndex(j) - 1],1 };
 
+					p1.x = p1.x * 30;
+					p1.y = p1.y * 30;
 					p1.x /= viewportWidth;
 					p1.y /= viewportHeight;
-					p3 = p1 + p2;
-					drawLine((A*p3), (A*p2));
+					p3.x = p1.x + p2.x;
+					p3.y = p1.y + p2.y;
+					p3.z = p2.z;
+					p3.w = p2.w ;
+					
+				//	std::cout <<"aaa:"<< p3.x - p2.x << std::endl;
+					p2 = A * p2;
+					p3 = A * p3;
+					//std::cout << p3.x - p2.x << std::endl;
+					drawLine((p3), (p2));
 				}
 		}
 		if (Box)
@@ -168,7 +179,7 @@ void Renderer::Render(const Scene& scene)
 	//#############################################
 
 	// Draw a chess board in the middle of the screen
-	/*for (int i = 100; i < viewportWidth - 100; i++)
+	for (int i = 100; i < viewportWidth - 100; i++)
 	{
 		for (int j = 100; j < viewportHeight - 100; j++)
 		{
@@ -185,7 +196,9 @@ void Renderer::Render(const Scene& scene)
 				putPixel(i, j, glm::vec3(1, 0, 0));
 			}
 		}
-	}*/
+	}
+	
+
 	drawActiveModel(scene, scene.getdrawNormals(),scene.getdrawFacesNormals(),scene.getdrawBox());
 }
 
@@ -489,8 +502,8 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, bool drawFace
 			glm::vec3 Dir = cross((v2 - v1), (v3 - v1));
 			Dir = normalize(Dir);
 			glm::vec3 center = { (v1[0] + v2[0] + v3[0]) / 3,(v1[1] + v2[1] + v3[1]) / 3,(v1[2] + v2[2] + v3[2]) / 3 };
-			Dir.x /= viewportWidth;
-			Dir.y /= viewportHeight;
+			Dir.x = (Dir.x / viewportWidth)*20;
+			Dir.y = (Dir.y / viewportHeight)*20;
 			drawLine(center, center + Dir);
 
 		}
