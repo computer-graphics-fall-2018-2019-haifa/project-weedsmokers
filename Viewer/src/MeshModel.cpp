@@ -10,8 +10,14 @@
 
 MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName) :
 	modelName(modelName),
-	worldTransform(glm::mat4x4(1))
-{
+	worldTransform(glm::mat4x4(1))	
+{	
+	/*this->material.ambient= glm::vec3(0.7, 0.5, 0.4);
+	this->material.diffuse = glm::vec3(0.7, 0.5, 0.4);
+	this->material.specular = glm::vec3(0.7, 0.5, 0.4);
+	this->material.shininess = 0.7;
+	*/
+
 	Aroundx = 0;
 	AroundY = 0;
 	AroundZ = 0;
@@ -46,23 +52,24 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 		for (j = 0; j < 3; j++) {
 			if (min[j] < 0) {
 
-				MeshModel::vertices[i][j] -= min[j];				
+				MeshModel::vertices[i][j] -= (min[j]);				
 			}
 		}
 	}
+
 	for (j = 0; j < 3; j++)
 		max[j] -= min[j];
 	for (i = 0; i < NumVertices; i++) {
-		MeshModel::vertices[i][0] = (MeshModel::vertices[i][0] / max[0]);
-		MeshModel::vertices[i][1] = (MeshModel::vertices[i][1] / max[1]);
-		MeshModel::vertices[i][2] = (MeshModel::vertices[i][2] / max[2]);
+		MeshModel::vertices[i][0] = ((MeshModel::vertices[i][0])/ max[0]);
+		MeshModel::vertices[i][1] = ((MeshModel::vertices[i][1]) / max[1]);
+		MeshModel::vertices[i][2] = ((MeshModel::vertices[i][2])/ max[2]);
 	}
 
 	
-	Box.push_back({ min[0],max[1],1 });
-	Box.push_back({ max[0],max[1],1 });
-	Box.push_back({ min[0],min[1],1 });
-	Box.push_back({ max[0],min[1],1 });
+	Box.push_back({ min[0],max[1],100 });
+	Box.push_back({ max[0],max[1],100 });
+	Box.push_back({ min[0],min[1],100 });
+	Box.push_back({ max[0],min[1],100 });
 
 	
 	/*min[0] = MeshModel::normals[0][0];
@@ -133,19 +140,68 @@ const glm::mat4x4& MeshModel::GetWorldTransformation() const
 	return  A;
 }
 
-void MeshModel::SetColor(const glm::vec4& color)
+void MeshModel::setDrawing(bool drawBox, bool drawNormals, bool drawFacesNormals)
 {
-	this->color = color;
+	this->drawBox = drawBox;
+	this->drawNormals = drawNormals;
+	this->drawFacesNormals = drawFacesNormals;
 }
 
-const glm::vec4& MeshModel::GetColor() const
+bool MeshModel::getDrawBox() const
 {
-	return color;
+	return this->drawBox;
 }
+
+bool MeshModel::getDrawNormals() const
+{
+	return this->drawNormals;
+}
+
+bool MeshModel::getdrawFacesNormals() const
+{
+	return this->drawFacesNormals;
+}
+
+const glm::vec4 & MeshModel::getverticesColor() const
+{
+	return glm::vec4(this->verticesColor);
+}
+
+const glm::vec4 & MeshModel::getfillingrColor() const
+{
+	return glm::vec4(this->fillingrColor);
+}
+
+void MeshModel::SetColor(const glm::vec4& verticesColor, const glm::vec4& fillingrColor)
+{
+	this->verticesColor = verticesColor;
+	this->fillingrColor = fillingrColor;
+
+}
+
+void MeshModel::SetMaterial(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess)
+{
+	this->material.ambient = ambient;
+	this->material.diffuse = diffuse;
+	this->material.specular = specular;
+	this->material.shininess = shininess;
+}
+
+Material MeshModel::getMaterial() const
+{
+	return this->material;
+}
+
+
 
 const std::string& MeshModel::GetModelName()
 {
 	return modelName;
+}
+
+std::vector<glm::vec3> MeshModel::getBox()
+{
+	return this->Box;
 }
 
 void MeshModel::SetScale(float scaleX, float scaleY)

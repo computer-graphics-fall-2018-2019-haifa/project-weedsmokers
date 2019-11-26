@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
-
 /*
  * Renderer class.
  */
@@ -19,8 +18,11 @@ private:
 	int viewportX;
 	int viewportY;
 	friend class MeshModel;
-	void putPixel(int x, int y, const glm::vec3& color);
+	void putPixel(int x, int y, const glm::vec3& color) const;
 	void createBuffers(int viewportWidth, int viewportHeight);
+	//glm::vec3 colorBuffer[1920][1001];
+	//float zBuffer[1920][1001];
+
 
 	GLuint glScreenTex;
 	GLuint glScreenVtc;
@@ -30,22 +32,28 @@ private:
 
 public:
 	Renderer(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
-	//Renderer(int viewportWidth=0, int viewportHeight=0, int viewportX = 0, int viewportY = 0);
 	~Renderer();
 
 	void Render(const Scene& scene);
+	void Bloom(const Scene & scene, float * buffer);
+	void blurScreen(float * buffer, bool print);
+	void drawBox(std::vector<glm::vec3> box, MeshModel model, const Scene & scene, glm::vec3 color);
 	void SwapBuffers();
-	void drawLine(const glm::vec2 & p0, const glm::vec2 & p1);
-	void drawLineLow(const glm::vec2 & p0, const glm::vec2 & p1);
-	void drawLineHight(const glm::vec2 & p0, const glm::vec2 & p1);
-	void drawTriangles(const std::vector<glm::vec3> * points, bool drawFacesNormals = false);
+	void drawLine(const glm::vec3 point0, const glm::vec3 point1, const std::vector<glm::vec3>* points,  const std::vector<glm::vec3>* normals, Material material, const Scene & scence, int shadingType, glm::vec3 color) const;
+	void drawLine2(const glm::vec3 point0, const glm::vec3 point1, const glm::vec3 normalP0, const glm::vec3 normalP1, Material material, const Scene & scence, int shadingType, glm::vec3 color) const;
+	void drawTriangles(const std::vector<glm::vec3>* points, const std::vector<glm::vec3>* normals,  const Scene & scene, Material material, bool drawFacesNormal, int shadingType);
+	void fillBottomFlatTriangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 normalP1, glm::vec3 normalP2, glm::vec3 normalP3, const Scene & scene, Material material, bool drawFacesNormal, int shadingType);
+	void fillTopFlatTriangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 normalP1, glm::vec3 normalP2, glm::vec3 normalP3, const Scene & scene, Material material, bool drawFacesNormal, int shadingType);
+	glm::vec3 calculatepointLight(const glm::vec3 vertex, const glm::vec3 normal, Material material, PointLight light) const;
 	int ReScaleX(float num);
 	int ReScaleY(float num);
+	glm::vec3 getcolor(const glm::vec3 vertex, const glm::vec3 normal, Material material, const Scene & scene) const;
+	glm::vec3 calculateParallelLight(const glm::vec3 vertex, const glm::vec3 normal, Material material, ParallelLight light) const;
 	void ClearColorBuffer(const glm::vec3& color);
 	void SetViewport(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
-	void drawActiveModel(const Scene& scene , bool drawNormals, bool drawFacesNormals,bool Box);
+	void drawModel(const Scene & scene, const MeshModel & model);
 
-	void putPixel2(int i, int j, const glm::vec3& color);
+	//void putPixel2(int i, int j, const glm::vec3& color);
 
 	// write function that takes a model and draw it
 	// Add more methods/functionality as needed...

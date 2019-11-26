@@ -34,11 +34,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 int main(int argc, char **argv)
 {
-	glm::vec2 p0, p1;
-	p0.x = 0.15;
-	p0.y = 0.12;
-	p1.x = 0.379;
-	p1.y = 0.700;
+
 	
 
 
@@ -59,7 +55,19 @@ int main(int argc, char **argv)
 
 	// Create the renderer and the scene
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
+
 	Scene scene = Scene();
+	glm::vec4 eye = glm::vec4(0.0, 0.0, 10.0,0.0);
+	glm::vec4 at = glm::vec4(0.0, 0.0, 0.0, 0.0);
+	glm::vec4 up = glm::vec4(0.0, 1.0, 0.0, 0.0);
+
+	Camera camera = Camera(eye,at,up);
+	scene.AddCamera(camera);
+	scene.GetActiveCamera().SetCameraLookAt(eye, at, up);
+//	Camera camera =  Camera();
+	//scene.AddCamera(camera);
+
+
 
 	// Setup ImGui
 	ImGuiIO& io = SetupDearImgui(window);
@@ -71,7 +79,8 @@ int main(int argc, char **argv)
 	// This is the main game loop..
 	while (!glfwWindowShouldClose(window))
 	{
-		
+		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		renderer.SetViewport(frameBufferWidth, frameBufferHeight, 0, 0);
 		glfwPollEvents();
 		StartFrame();
 
