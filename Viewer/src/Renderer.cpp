@@ -31,7 +31,7 @@ void Renderer::putPixel(int i, int j, const glm::vec3& color)
 	if (j < 0) return; if (j >= viewportHeight) return;
 
 	
-	colorBuffer[INDEX(viewportWidth, i, j, 0)] = color.x;
+	colorBuffer[INDEX(viewportWidth, i, j, 0)] = color.x; 
 	colorBuffer[INDEX(viewportWidth, i, j, 1)] = color.y;
 	colorBuffer[INDEX(viewportWidth, i, j, 2)] = color.z;
 }
@@ -320,21 +320,6 @@ void Renderer::drawLine(const glm::vec2& p0, const glm::vec2& p1)
 {
 	
 	
-/*	if (std::abs(p1.y - p0.y)  <= std::abs(p1.x - p0.x))
-	{ // line slope is less than 1
-		if (p0.x > p1.x)
-			drawLineLow(p1, p0);
-		else
-			drawLineLow(p0, p1);
-	}
-	else
-	{	// line slope is greater than 1
-		if(p0.y > p1.y)
-			drawLineHight(p1, p0);
-		else
-			drawLineHight(p0, p1);
-
-	}*/
 
 
 	// Bresenham's line algorithm
