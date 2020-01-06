@@ -10,8 +10,8 @@
 
 MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName) :
 	modelName(modelName),
-	worldTransform(glm::mat4x4(1))	
-{	
+	worldTransform(glm::mat4x4(1))
+{
 	/*this->material.ambient= glm::vec3(0.7, 0.5, 0.4);
 	this->material.diffuse = glm::vec3(0.7, 0.5, 0.4);
 	this->material.specular = glm::vec3(0.7, 0.5, 0.4);
@@ -31,6 +31,7 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	int NumVertices = vertices.size(), i, j;
 	int NumNormals = normals.size();
 	MeshModel::vertices = vertices;
+	glm::vec3 p;
 
 	double min[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
 	double max[3] = { MeshModel::vertices[0][0],MeshModel::vertices[0][1],MeshModel::vertices[0][2] };
@@ -50,20 +51,33 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	}
 	for (i = 1; i < NumVertices; i++) {
 		for (j = 0; j < 3; j++) {
-			if (min[j] < 0) {
-
-				MeshModel::vertices[i][j] -= (min[j]);				
+			if (i == 9 && j == 2)
+			{
+				double k;
+				MeshModel::vertices[i][j] -= (min[j]);
+				MeshModel::vertices[i][j] *= 2;
+				MeshModel::vertices[i][j] = MeshModel::vertices[i][j] / (max[j] - min[j]);				
+				MeshModel::vertices[i][j] = MeshModel::vertices[i][j] - 1;
+			}
+			else
+			{
+				MeshModel::vertices[i][j] -= (min[j]);
+				MeshModel::vertices[i][j] *= 2;
+				MeshModel::vertices[i][j] = MeshModel::vertices[i][j] / (max[j] - min[j]);
+				MeshModel::vertices[i][j] = MeshModel::vertices[i][j] - 1;
 			}
 		}
 	}
 
-	for (j = 0; j < 3; j++)
-		max[j] -= min[j];
-	for (i = 0; i < NumVertices; i++) {
-		MeshModel::vertices[i][0] = ((MeshModel::vertices[i][0])/ max[0]);
-		MeshModel::vertices[i][1] = ((MeshModel::vertices[i][1]) / max[1]);
-		MeshModel::vertices[i][2] = ((MeshModel::vertices[i][2])/ max[2]);
-	}
+	/*for (j = 0; j < 3; j++)
+		max[j] -= min[j];*/
+	/*for (i = 0; i < NumVertices; i++) {
+			MeshModel::vertices[i][0] = ((2 * (MeshModel::vertices[i][0] - min[0]) / (max[0] - min[0])) - 1);
+			MeshModel::vertices[i][1] = ((2 * (MeshModel::vertices[i][1] - min[1]) / (max[1] - min[1])) - 1);
+			MeshModel::vertices[i][2] = ((2 * (MeshModel::vertices[i][2] - min[2]) / (max[2] - min[2])) - 1);
+			MeshModel::vertices[i][0]
+		
+	}*/
 
 	
 	Box.push_back({ min[0],max[1],100 });

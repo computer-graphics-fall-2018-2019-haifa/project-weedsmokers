@@ -15,6 +15,9 @@
 float AroundX = 0;
 float AroundY = 0;
 float AroundZ = 0;
+float AroundX1 = 0;
+float AroundY1 = 0;
+float AroundZ1 = 0;
 bool showDemoWindow = false;
 bool showAnotherWindow = false;
 bool drawNormals = false;
@@ -75,10 +78,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &showDemoWindow);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &showAnotherWindow);
-	
+		
 		if (perspective)
 		{
 		
@@ -128,7 +128,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
  		if (ImGui::CollapsingHeader("Camera setting"))
 		{
-			
+			static int i5 = 1;
 			ImGui::SliderFloat("Camera X Position:", &eye.x, -1, 10);
 			ImGui::SliderFloat("Camera Y Position:", &eye.y, -1, 10);
 			ImGui::SliderFloat("Camera Z Position:", &eye.z, -1, 10);
@@ -141,6 +141,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::SliderFloat("Camera Looking At X:", &at.x, -1, 10);
 			ImGui::SliderFloat("Camera Looking At Y:", &at.y, -1, 10);
 			ImGui::SliderFloat("Camera Looking At Z", &at.z, -1, 10);
+			//ImGui::Text("Choose world or view frame:", counter);
+			ImGui::SliderInt("Choose world or view frame:", &i5, 1, 2);
 
 			/*ImGui::SliderFloat("RoateAroundX", &AroundX, -180, 180);
 			ImGui::SliderFloat("Camera X Position:", &x1, -1, 10);
@@ -182,7 +184,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			}
 			
 			//scene.SetActiveCameraIndex(i1);
-			scene.setActiveCameraLookAt(eye, at, up);
+			if(i5==1)
+				scene.setActiveCameraLookAt(eye, glm::vec3(0,0,0), up);
+			else
+				scene.setActiveCameraLookAt(eye, at, up);
 			static int i2 = 0;
 		}
 
@@ -190,10 +195,13 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		static float scaleY = 1;
 		static float TranslateX =0.2;
 		static float TranslateY = 0.2;
+		static float TranslateX1 = 0;
+		static float TranslateY1 = 0;
 		scene.ScaleActiveModel(scaleX/3+zoom/10, scaleY/3+zoom/10);
 		scene.TranslateActiveModel(TranslateX, TranslateY);
 		if (ImGui::CollapsingHeader("Object setting"))
 		{	
+			static int i6 = 1;
 
 			static int i2 = 1;
 			ImGui::SliderInt("Choose Model", &i2, 1, scene.GetModelCount());
@@ -205,16 +213,25 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::SliderFloat("scaleY", &scaleY, 0.01, 10);
 			scene.ScaleActiveModel(scaleX/3+zoom/10, scaleY/3+zoom/10);	
 			
+			ImGui::Text("Model frame:");
 			ImGui::SliderFloat("TranslateX", &TranslateX, -1, 1);		
-			ImGui::SliderFloat("TranslateY", &TranslateY, -5, 5);
-			scene.TranslateActiveModel(TranslateX, TranslateY);
+			ImGui::SliderFloat("TranslateY", &TranslateY, -1, 1);
 
 			ImGui::SliderFloat("RoateAroundX", &AroundX, -180, 180);
 			ImGui::SliderFloat("RotateAroundY", &AroundY, -180, 180);
 			ImGui::SliderFloat("RotateAroundZ", &AroundZ, -180, 180);
-			scene.RotateActiveModel(glm::radians(AroundX), glm::radians(AroundY), glm::radians(AroundZ));
+			ImGui::Text("World frame:");
 
-		
+			ImGui::SliderFloat("TranslateX", &TranslateX1, -1, 1);
+			ImGui::SliderFloat("TranslateY", &TranslateY1, -1, 1);
+
+			ImGui::SliderFloat("RoateAroundX", &AroundX1, -180, 180);
+			ImGui::SliderFloat("RotateAroundY", &AroundY1, -180, 180);
+			ImGui::SliderFloat("RotateAroundZ", &AroundZ1, -180, 180);
+
+			scene.TranslateActiveModel(TranslateX+ TranslateX1+2, TranslateY+ TranslateY1+2);
+			scene.RotateActiveModel(glm::radians(AroundX+ AroundX1), glm::radians(AroundY+ AroundY1), glm::radians(AroundZ+ AroundZ1));
+
 			ImGui::ColorEdit3("ambient color", (float*)&activeModelMaterial.ambient);
 			ImGui::ColorEdit3("diffuse color", (float*)&activeModelMaterial.diffuse);
 			ImGui::ColorEdit3("specular color", (float*)&activeModelMaterial.specular);
@@ -313,7 +330,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 
 		}
-
+		
 
 
 
@@ -326,6 +343,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			AroundX = 0;
 			AroundY = 0;
 			AroundZ = 0;
+			TranslateX1 = 0;
+			TranslateY1 = 0;
+			AroundX1 = 0;
+			AroundY1 = 0;
+			AroundZ1 = 0;
 			normalsLength = 30;
 			faceNormalsLength = 30;
 
@@ -405,4 +427,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::EndMainMenuBar();
 		}
 	}
+}
+
+void cross(const glm::vec3& p1, const glm::vec3& p2) {
+	glm::vec3 result;
+	result[0] = p1[1] * p2[2] - p1[2] * p2[1];
+	result[1] = p1[0] * p2[2] - p1[2] * p2[0];
+	result[2] = p1[0] * p2[1] - p1[1] * p2[0];
 }

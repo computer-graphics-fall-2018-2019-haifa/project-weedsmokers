@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <iostream>
+//#include <armadillo>
 #include "Renderer.h"
 #include "InitShader.h"
 #include "MeshModel.h"
@@ -10,6 +11,8 @@
 #include "ImguiMenus.h"
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define INDEX2(width,x,y) ((x)+(y)*(width))*3
+static int X_width = 1280;
+static int Y_width = 720;
 
 Renderer::Renderer(int viewportWidth, int viewportHeight, int viewportX, int viewportY) :
 	colorBuffer(nullptr),
@@ -93,13 +96,16 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 	glm::mat4x4 modelViewMatrix = model.GetWorldTransformation();
 	glm::mat4x4 projectionMatrix = camera.getProjectionTransformation();
 	glm::mat4x4 viewTransformation = camera.getviewTransformation();
+
 	bool drawBox = scene.getdrawBox();//model.getDrawBox();
 	bool drawNormals = scene.getdrawNormals();
 	bool drawFacesNormals = scene.getdrawFacesNormals();
+
+
 	glm::vec4 verticesColor = model.getverticesColor();
 	glm::vec4 fillingrColor = model.getfillingrColor();
 	Material material = model.getMaterial();
-	//glm::vec4 ambient = scene.getAmbientLightColor();
+	glm::vec4 ambient = scene.getAmbientLightColor();
 
 	int i,j;
 	std::vector<glm::vec3> points;
@@ -112,42 +118,50 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		int i = 0;
 		v1 = glm::vec4(0, 1, 1, 1);
 		v2 = glm::vec4(1, 1, 1, 1);
-		v1 = projectionMatrix* viewTransformation * modelViewMatrix *v1;
-		v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
-		v1.x = int(v1.x*viewportWidth);
-		v1.y = int(v1.y*viewportHeight);
-		v2.x = int(v2.x*viewportWidth);
-		v2.y = int(v2.y*viewportHeight);
+		//v1 = projectionMatrix* viewTransformation * modelViewMatrix *v1;
+		//v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
+		v1 = projectionMatrix  * modelViewMatrix *v1;
+		v2 = projectionMatrix  * modelViewMatrix *v2;
+		v1.x = ReScaleX(v1.x);
+		v1.y = ReScaleY(v1.y);
+		v2.x = ReScaleX(v2.x);
+		v2.y = ReScaleY(v2.y);
 		for (i = v1.x; i <= v2.x; i++)
 			putPixel(i, v2.y, glm::vec3(0, 0, 0));
 		v1 = glm::vec4(1, 1, 1, 1);
 		v2 = glm::vec4(1, 0, 1, 1);
-		v1 = projectionMatrix * viewTransformation * modelViewMatrix *v1;
-		v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
-		v1.x = int(v1.x*viewportWidth);
-		v1.y = int(v1.y*viewportHeight);
-		v2.x = int(v2.x*viewportWidth);
-		v2.y = int(v2.y*viewportHeight);
+		//v1 = projectionMatrix* viewTransformation * modelViewMatrix *v1;
+			//v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
+		v1 = projectionMatrix * modelViewMatrix *v1;
+		v2 = projectionMatrix * modelViewMatrix *v2;
+		v1.x = ReScaleX(v1.x);
+		v1.y = ReScaleY(v1.y);
+		v2.x = ReScaleX(v2.x);
+		v2.y = ReScaleY(v2.y);
 		for (i = v2.y; i <= v1.y; i++)
 			putPixel(v2.x, i, glm::vec3(0, 0, 0));	
 		v1 = glm::vec4(0, 0, 1, 1);
 		v2 = glm::vec4(1, 0, 1, 1);
-		v1 = projectionMatrix * viewTransformation * modelViewMatrix *v1;
-		v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
-		v1.x = int(v1.x*viewportWidth);
-		v1.y = int(v1.y*viewportHeight);
-		v2.x = int(v2.x*viewportWidth);
-		v2.y = int(v2.y*viewportHeight);;
+		//v1 = projectionMatrix* viewTransformation * modelViewMatrix *v1;
+			//v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
+		v1 = projectionMatrix * modelViewMatrix *v1;
+		v2 = projectionMatrix * modelViewMatrix *v2;
+		v1.x = ReScaleX(v1.x);
+		v1.y = ReScaleY(v1.y);
+		v2.x = ReScaleX(v2.x);
+		v2.y = ReScaleY(v2.y);;
 		for (i = v1.x; i <= v2.x; i++)
 			putPixel(i, v2.y, glm::vec3(0, 0, 0));		
 		v1 = glm::vec4(0, 1, 1, 1);
 		v2 = glm::vec4(0, 0, 1, 1);
-		v1 = projectionMatrix * viewTransformation * modelViewMatrix *v1;
-		v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
-		v1.x = int(v1.x*viewportWidth);
-		v1.y = int(v1.y*viewportHeight);
-		v2.x = int(v2.x*viewportWidth);
-		v2.y = int(v2.y*viewportHeight);
+		//v1 = projectionMatrix* viewTransformation * modelViewMatrix *v1;
+		//v2 = projectionMatrix * viewTransformation * modelViewMatrix *v2;
+		v1 = projectionMatrix  * modelViewMatrix *v1;
+		v2 = projectionMatrix  * modelViewMatrix *v2;
+		v1.x = ReScaleX(v1.x);
+		v1.y = ReScaleY(v1.y);
+		v2.x = ReScaleX(v2.x);
+		v2.y = ReScaleY(v2.y);
 		for (i = v2.y; i <= v1.y; i++)
 			putPixel(v2.x, i, glm::vec3(0, 0, 0));
 
@@ -157,19 +171,20 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		for (int j = 0; j < 3; j++) {	// filling each face info in vector and sending it to be drawn.
 			point = glm::vec4(model.vertices[(model.faces[i].GetVertexIndex(j)) - 1], 1);
 			normal= glm::vec4(model.normals[(model.faces[i].GetNormalIndex(j)) - 1], 1);
+			//normal = normal * inv(modelViewMatrix);
 			point = viewTransformation*modelViewMatrix * point;
 			if (drawNormals)
 			{
 				temp = projectionMatrix * point;
 				tempNormal = normal;
-				tempNormal.x = float(normal.x / viewportWidth);
-				tempNormal.y = float(normal.y / viewportHeight);
+				tempNormal.x = float(normal.x / X_width);
+				tempNormal.y = float(normal.y / Y_width);
 
 				pointNormal = glm::vec4(temp,1) + glm::vec4(tempNormal,1) * float(scene.getNoramlsLength());
-				temp.x = int(temp.x*viewportWidth);
-				temp.y = int(temp.y*viewportHeight);
-				pointNormal.x = int(pointNormal.x*viewportWidth);
-				pointNormal.y = int(pointNormal.y*viewportHeight);
+				temp.x = int(temp.x*X_width);
+				temp.y = int(temp.y*Y_width);
+				pointNormal.x = int(pointNormal.x*X_width);
+				pointNormal.y = int(pointNormal.y*Y_width);
 
 				drawLine2(temp, pointNormal, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -183,8 +198,8 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		;
 
 			glm::vec3 vertex = projectionMatrix*(glm::vec4(points[0],1) + glm::vec4(points[1], 1) + glm::vec4(points[2], 1)) / float(3);
-			vertex.x = int(vertex.x*viewportWidth);
-			vertex.y = int(vertex.y*viewportHeight);
+			vertex.x = ReScaleX(vertex.x);
+			vertex.y = ReScaleY(vertex.y);
 			vertex2 = vertex;
 			faceNormal = normalize(cross(points[1] - points[0], points[2] - points[0]));
 			vertex2 = vertex2 + faceNormal * float(scene.getFacesNoramlsLength());
@@ -204,10 +219,6 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 
 void Renderer::Render(const Scene& scene)
 {
-	
-
-
-	
 	
 	int i;
 	for (i = 0; i < scene.GetModelCount() && scene.getDraw(); i++)
@@ -532,18 +543,21 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 		{
 			
 
-			vertex.x = float(y) / float(viewportWidth);
-			vertex.y = float(x) / float(viewportHeight);
+ 			//vertex.x = float(y) / float(X_width);
+			//vertex.y = float(x) / float(Y_width);
 
+			vertex.x = int(y);
+			vertex.y = int(x);
+			
 			w1 = ((v2.y - v3.y)*(vertex.x - v3.x) + (v3.x - v2.x)*(vertex.y - v3.y)) / ((v2.y - v3.y)*(v1.x - v3.x) + (v3.x - v2.x)*(v1.y - v3.y));
 			w2 = ((v3.y - v1.y)*(vertex.x - v3.x) + (v1.x - v3.x)*(vertex.y - v3.y)) / ((v2.y - v3.y)*(v1.x - v3.x) + (v3.x - v2.x)*(v1.y - v3.y));
 			w3 = 1 - (w1 + w2);
 			vertex.z = w1 * (*points)[0].z + w2 * (*points)[1].z + w3 * (*points)[2].z;
 			//vertex.z = point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX;
-			glVertex= projectionMatrix /**viewTransformation */ * glm::vec4(vertex,1);
-			glVertex.x = int(glVertex.x*viewportWidth)-1;
-			glVertex.y = int(glVertex.y *viewportHeight)-1;
-
+			//glVertex= projectionMatrix /**viewTransformation */ * glm::vec4(vertex,1);
+			//glVertex.x = int(glVertex.x*X_width)-1;
+			//glVertex.y = int(glVertex.y *Y_width)-1;
+			glVertex = vertex;
 			if (shadingType >= 0)
 			{
 				
@@ -580,8 +594,10 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 		{
 			
 
-			vertex.x = float(x) / float(viewportWidth);
-			vertex.y = float(y) / float(viewportHeight);
+			//vertex.x = float(x) / float(X_width);
+			//vertex.y = float(y) / float(Y_width);
+			vertex.x = int(x);
+			vertex.y = int(y);
 
 			w1 = ((v2.y - v3.y)*(vertex.x - v3.x) + (v3.x - v2.x)*(vertex.y - v3.y)) / ((v2.y - v3.y)*(v1.x - v3.x) + (v3.x - v2.x)*(v1.y - v3.y));
 			w2 = ((v3.y - v1.y)*(vertex.x - v3.x) + (v1.x - v3.x)*(vertex.y - v3.y)) / ((v2.y - v3.y)*(v1.x - v3.x) + (v3.x - v2.x)*(v1.y - v3.y));
@@ -589,9 +605,10 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 			vertex.z = w1 * (*points)[0].z + w2 * (*points)[1].z + w3 * (*points)[2].z;
 		//	vertex.z= point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX;
 			//vertex = glm::vec3(float(x / viewportWidth), float(y / viewportHeight), point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX);
-			glVertex = projectionMatrix*  /*viewTransformation*  */ glm::vec4(vertex,1);
-			glVertex.x = int(glVertex.x*viewportWidth)-1;
-			glVertex.y = int(glVertex.y *viewportHeight)-1;
+			//glVertex = projectionMatrix*  /*viewTransformation*  */ glm::vec4(vertex,1);
+			//glVertex.x = int(glVertex.x*X_width)-1;
+			//glVertex.y = int(glVertex.y *Y_width)-1;
+			glVertex = vertex;
 			if (shadingType >= 0)
 			{
 				
@@ -616,7 +633,7 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 				}
 			}
 
-			if (glVertex.x >= 0 && glVertex.x <= viewportWidth && glVertex.y >= 0 && glVertex.y <= viewportHeight)
+			if (glVertex.x >= 0 && glVertex.x <= X_width && glVertex.y >= 0 && glVertex.y <= Y_width)
 			{
 
 				if ((zBuffer[int((glVertex.x) + (glVertex.y)*(viewportWidth))] <= glVertex.z) );
@@ -700,13 +717,13 @@ void Renderer::drawLine2(const glm::vec3 point0, const glm::vec3 point1, const g
 	{
 		if (steep)
 		{
-			vertex.x = float(y) / float(viewportWidth);
-			vertex.y = float(x) / float(viewportHeight);
+			vertex.x = float(y) / float(X_width);
+			vertex.y = float(x) / float(Y_width);
 			vertex.z = point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX;
 			//vertex = glm::vec3(y / viewportWidth, x / viewportHeight, point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX);
 			glVertex = glm::vec4(vertex, 1); //projectionMatrix * viewTransformation * glm::vec4(vertex, 1);
-			glVertex.x = int(glVertex.x*viewportWidth);
-			glVertex.y = int(glVertex.y *viewportHeight);
+			glVertex.x = int(glVertex.x*X_width);
+			glVertex.y = int(glVertex.y *Y_width);
 
 			if (shadingType == 1)
 			{
@@ -728,13 +745,13 @@ void Renderer::drawLine2(const glm::vec3 point0, const glm::vec3 point1, const g
 		}
 		else
 		{
-			vertex.x = float(x) / float(viewportWidth);
-			vertex.y = float(y) / float(viewportHeight);
+			vertex.x = float(x) / float(X_width);
+			vertex.y = float(y) / float(X_width);
 			vertex.z = point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX;
 			//vertex = glm::vec3(float(x / viewportWidth), float(y / viewportHeight), point0.z *(point0.x - x) / LengthX + point1.z *(x - point1.x) / LengthX);
 			glVertex = glm::vec4(vertex, 1); //projectionMatrix * viewTransformation * glm::vec4(vertex, 1);
-			glVertex.x = int(glVertex.x*viewportWidth);
-			glVertex.y = int(glVertex.y *viewportHeight);
+			glVertex.x = int(glVertex.x*X_width);
+			glVertex.y = int(glVertex.y *X_width);
 			if (shadingType == 1)
 			{
 				color = colorOfp0 * (point1.x - x) / float(LengthX) + colorOfp1 * (x - point0.x) / float(LengthX);
@@ -843,7 +860,7 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 	normalP1 = (*normals)[0];
 	normalP2 = (*normals)[1];
 	normalP3 = (*normals)[2];
-
+	color = getcolor(v1, normalP1, material, scene);
 	if (v1.y > v2.y)
 	{
 		temp = v1;
@@ -874,15 +891,22 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 		normalP1 = normalP2;
 		normalP2 = temp;
 	}
-	v1.x = int(v1.x*viewportWidth);
-	v1.y = int(v1.y*viewportHeight);
-	v2.x = int(v2.x*viewportWidth);
-	v2.y = int(v2.y*viewportHeight);
-	v3.x = int(v3.x*viewportWidth);
-	v3.y = int(v3.y*viewportHeight);
-	
+	v1.x = int((v1.x+1)*X_width);
+	v1.y = int((v1.y+1)*Y_width);
+	v2.x = int((v2.x+1)*X_width);
+	v2.y = int((v2.y+1)*Y_width);
+	v3.x = int((v3.x+1)*X_width);
+	v3.y = int((v3.y+1)*Y_width);
+	drawLine(v1, v2, points, normals, material, scene, shadingType, color);
+	drawLine(v2, v3, points, normals, material, scene, shadingType, color);
+	drawLine(v1, v3, points, normals, material, scene, shadingType, color);
 
-	color = getcolor(v1, normalP1, material, scene);
+	/*drawLine(v1, v2, points, normals, material, scene, shadingType, glm::vec3({ 0,0,0 }));
+	drawLine(v2, v3, points, normals, material, scene, shadingType, glm::vec3({ 0,0,0 }));
+	drawLine(v1, v3, points, normals, material, scene, shadingType, glm::vec3({ 0,0,0 }));*/
+
+
+	
 
 
 	if (v2.y - v1.y > 0)
@@ -1024,12 +1048,12 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 
 int	Renderer::ReScaleX(float num)
 {
-	return num * viewportWidth ;
+	return num * 1280 ;
 }
 
 int	Renderer::ReScaleY(float num)
 {
-	return num * viewportHeight;
+	return num * 720;
 }
 
 
