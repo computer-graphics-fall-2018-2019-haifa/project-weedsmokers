@@ -41,7 +41,7 @@ void Renderer::putPixel(int i, int j, const glm::vec3& color) const
 	if (j < 0) return; if (j >= viewportHeight) return;
 
 	
-	colorBuffer[INDEX(viewportWidth, i, j, 0)] = color.x;
+	colorBuffer[INDEX(viewportWidth, i, j, 0)] = color.x; 
 	colorBuffer[INDEX(viewportWidth, i, j, 1)] = color.y;
 	colorBuffer[INDEX(viewportWidth, i, j, 2)] = color.z;
 }
@@ -522,6 +522,7 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 	}
 	
 
+
 	if (temp_p0.x > temp_p1.x)
 	{
 		std::swap(temp_p0.x, temp_p1.x);
@@ -629,6 +630,7 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 					//normal = normalP0 * (point0.x - x) / float(LengthX) + normalP1 * (x - point1.x) / float(LengthX);
 					normal = w1 * (*normals)[0] + w2 * (*normals)[1] + w3 * (*normals)[2];
 					color = getcolor(vertex, normal, material, scence);
+
 
 				}
 			}
