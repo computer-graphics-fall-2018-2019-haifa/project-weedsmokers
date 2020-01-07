@@ -197,7 +197,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		static float TranslateY = 0.2;
 		static float TranslateX1 = 0;
 		static float TranslateY1 = 0;
-		scene.ScaleActiveModel(scaleX/3+zoom/10, scaleY/3+zoom/10);
+		scene.ScaleActiveModel(scaleX/20+zoom/10, scaleY/20+zoom/10);
 		scene.TranslateActiveModel(TranslateX, TranslateY);
 		if (ImGui::CollapsingHeader("Object setting"))
 		{	
@@ -211,7 +211,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			}
 			ImGui::SliderFloat("scaleX", &scaleX, 0.01, 10);
 			ImGui::SliderFloat("scaleY", &scaleY, 0.01, 10);
-			scene.ScaleActiveModel(scaleX/3+zoom/10, scaleY/3+zoom/10);	
+			scene.ScaleActiveModel(scaleX/20+zoom/10, scaleY/20+zoom/10);	
 			
 			ImGui::Text("Model frame:");
 			ImGui::SliderFloat("TranslateX", &TranslateX, -1, 1);		

@@ -41,12 +41,15 @@ public:
 	void SwapBuffers();
 	void drawLine(const glm::vec3 point0, const glm::vec3 point1, const std::vector<glm::vec3>* points,  const std::vector<glm::vec3>* normals, Material material, const Scene & scence, int shadingType, glm::vec3 color) const;
 	void drawLine2(const glm::vec3 point0, const glm::vec3 point1, const glm::vec3 normalP0, const glm::vec3 normalP1, Material material, const Scene & scence, int shadingType, glm::vec3 color) const;
-	void drawTriangles(const std::vector<glm::vec3>* points, const std::vector<glm::vec3>* normals,  const Scene & scene, Material material, bool drawFacesNormal, int shadingType);
+	void drawTriangles(const std::vector<glm::vec3>* points, const std::vector<glm::vec3>* normals,  const Scene & scene, const MeshModel &model, glm::mat3x2 scaleMatrix);
+	int ReScaleX(float num, glm::mat3x2 scaleMatrix);
+	int ReScaleY(float num, glm::mat3x2 scaleMatrix);
+	int ReScaleZ(float num, glm::mat3x2 scaleMatrix);
+	glm::vec3 ReScale(glm::vec3 & v, glm::mat3x2 scaleMatrix);
+	glm::vec3 Scale(glm::vec3 & v);
 	void fillBottomFlatTriangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 normalP1, glm::vec3 normalP2, glm::vec3 normalP3, const Scene & scene, Material material, bool drawFacesNormal, int shadingType);
 	void fillTopFlatTriangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 normalP1, glm::vec3 normalP2, glm::vec3 normalP3, const Scene & scene, Material material, bool drawFacesNormal, int shadingType);
 	glm::vec3 calculatepointLight(const glm::vec3 vertex, const glm::vec3 normal, Material material, PointLight light) const;
-	int ReScaleX(float num);
-	int ReScaleY(float num);
 	glm::vec3 getcolor(const glm::vec3 vertex, const glm::vec3 normal, Material material, const Scene & scene) const;
 	glm::vec3 calculateParallelLight(const glm::vec3 vertex, const glm::vec3 normal, Material material, ParallelLight light) const;
 	void ClearColorBuffer(const glm::vec3& color);
