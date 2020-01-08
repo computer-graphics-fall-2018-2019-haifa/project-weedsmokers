@@ -91,7 +91,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::ColorEdit3("clear color", (float*)&clearColor); // Edit 3 floats representing a color
-
+			scene.setbackgroundcolor(clearColor);
 			ImGui::Checkbox("perspective", &perspective);
 			if (perspective)
 			{
@@ -204,8 +204,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		static float scaleX = 3;
 		static float scaleY = 3;
-		static float TranslateX =0.2;
-		static float TranslateY = 0.2;
+		static float TranslateX =-1;
+		static float TranslateY = -1;
 		static float TranslateX1 = 0;
 		static float TranslateY1 = 0;
 		scene.ScaleActiveModel(scaleX+zoom/10, scaleY+zoom/10);

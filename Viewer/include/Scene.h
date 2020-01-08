@@ -50,6 +50,7 @@ private:
 	int activeModelIndex;
 	bool drawFacesNormals = false;
 	bool Box = false;
+	glm::vec4 bgColor;
 	int normalsLength = 10;
 	int faceNormalsLength = 10;
 	glm::vec2 size;
@@ -82,6 +83,8 @@ public:
 	const int GetActiveModelIndex() const;
 	void ScaleActiveModel(float scaleX, float scaleY);
 	void TranslateActiveModel(float x, float y);
+	void setbackgroundcolor(glm::vec4 bgColor);
+	glm::vec4 getbackgroundcolor(glm::vec4 bgColor);
 	void RotateActiveModel( float AroundX, float AroundY, float AroundZ);
 	  MeshModel GetActiveModel() const ;
 	  MeshModel getModelAtIndex(int i) const;

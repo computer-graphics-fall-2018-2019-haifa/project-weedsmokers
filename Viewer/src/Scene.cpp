@@ -178,9 +178,18 @@ void Scene::TranslateActiveModel(float x, float y)
 		models[GetActiveModelIndex()]->Translate(x, y);
 }
 
+void Scene::setbackgroundcolor(glm::vec4 bgColor)
+{
+	this->bgColor = bgColor;
 
 
+}
 
+glm::vec4 Scene::getbackgroundcolor(glm::vec4 bgColor)
+{
+
+	return bgColor;
+}
 
 void Scene::RotateActiveModel( float AroundX, float AroundY, float AroundZ)
 {

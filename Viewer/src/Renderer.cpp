@@ -11,8 +11,8 @@
 #include "ImguiMenus.h"
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define INDEX2(width,x,y) ((x)+(y)*(width))*3
-static int X_width = 1000;
-static int Y_width = 560;
+static int X_width = 500;
+static int Y_width = 280;
 
 Renderer::Renderer(int viewportWidth, int viewportHeight, int viewportX, int viewportY) :
 	colorBuffer(nullptr),
@@ -70,7 +70,7 @@ void Renderer::createBuffers(int viewportWidth, int viewportHeight)
 		for (int y = 0; y < viewportHeight; y++)
 		{
 			putPixel(x, y, glm::vec3(0.0f, 0.0f, 0.0f));
-			zBuffer[x + y * viewportWidth] = -100000;
+			zBuffer[x + y * viewportWidth] = INT_MIN;
 		}
 	}
 }
@@ -120,14 +120,19 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 	glm::vec3 faceNormal,temp, tempNormal, normal, pointNormal;
 	glm::vec3 vertex2, vertex3;
 	glm::vec4 v1, v2;
-	
-	scaleMatrix[0][0] = model.vertices[0][0];
-	scaleMatrix[0][1] = model.vertices[0][0];
-	scaleMatrix[1][0] = model.vertices[0][1];
-	scaleMatrix[1][1] = model.vertices[0][1];
-	scaleMatrix[2][0] = model.vertices[0][2];
-	scaleMatrix[2][1] = model.vertices[0][2];
-/*	for (i = 0; i < model.vertices.size(); i++)
+
+	point = glm::vec4(model.vertices[0], 1);
+	point = projectionMatrix * viewTransformation * modelViewMatrix * point;
+	point.x = point.x / point.w;
+	point.y = point.y / point.w;
+	point.z = point.z / point.w;
+	scaleMatrix[0][0] = point.x;
+	scaleMatrix[0][1] = point.x;
+	scaleMatrix[1][0] = point.y;
+	scaleMatrix[1][1] = point.y;
+	scaleMatrix[2][0] = point.z;
+	scaleMatrix[2][1] = point.z;
+	for (i = 1; i < model.vertices.size(); i++)
 	{
 		point = glm::vec4(model.vertices[i],1);
 		point =projectionMatrix * viewTransformation * modelViewMatrix * point;
@@ -143,7 +148,71 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		scaleMatrix[2][1] = std::min(scaleMatrix[2][1], point.z);
 
 
-	}*/
+	}
+	std::vector<glm::vec4> tempbox;
+	std::vector<glm::vec3> box;
+	if (drawBox)
+	{
+
+		point = glm::vec4(scaleMatrix[0][0], scaleMatrix[1][0], scaleMatrix[2][0], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][0], scaleMatrix[1][0], scaleMatrix[2][1], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][0], scaleMatrix[1][1], scaleMatrix[2][0], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][0], scaleMatrix[1][0], scaleMatrix[2][1], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][1], scaleMatrix[1][0], scaleMatrix[2][0], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][1], scaleMatrix[1][0], scaleMatrix[2][1], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][1], scaleMatrix[1][1], scaleMatrix[2][0], 1);
+		tempbox.push_back(point);
+		point = glm::vec4(scaleMatrix[0][1], scaleMatrix[1][1], scaleMatrix[2][1], 1);
+		tempbox.push_back(point);
+
+
+		for (int a = 0; a < 8; a++)
+		{
+			temp = tempbox[a];
+			temp = Scale(temp);
+			if (a == 0)
+				temp.x + 1;
+			box.push_back(temp);
+		}
+		int moveX = 25;
+		int moveY=25;
+		int minY = box[2].y;
+		int maxY = box[0].y;
+		int minX = box[5].x;
+		int maxX = box[0].x;
+
+		for (int i = minY; i < maxY; i++)
+		{
+			
+			if (i < maxY - moveX && i>minY + moveY)
+				putPixel(minX + moveX, i, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		}
+		for (int i = minY; i < maxY; i++) {
+			if (i < maxY - moveX && i>minY + moveY)
+				putPixel(maxX + moveX, i, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		}
+
+		drawLine2(glm::vec3(minX + moveX, minY + moveY, 0), box[6], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		drawLine2(glm::vec3(maxX + moveX, maxY - moveY, 0), box[1], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		drawLine2(glm::vec3(maxX + moveX, minY + moveY, 0), box[2], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		drawLine2(glm::vec3(minX + moveX, maxY - moveY, 0), box[5], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+
+
+		drawLine2(glm::vec3(minX + moveX, minY + moveY, 0), glm::vec3(maxX + moveX, minY + moveY, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		drawLine2(glm::vec3(minX + moveX, maxY - moveY, 0), glm::vec3(maxX + moveX, maxY - moveY, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+
+
+
+
+	}
 	glm::vec4 vertex = glm::vec4(0, 0,0, 0);
 	glm::mat3x3 normMatrix = glm::transpose(glm::inverse(modelViewMatrix));
 	for (i = 0; i < model.faces.size(); i++)
@@ -213,6 +282,40 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		drawTriangles(&points, &normals, scene, model,scaleMatrix);
 		points.clear();
 		normals.clear();
+	}
+	if (drawBox)
+	{
+		
+		int move = 25;
+		int minY = box[2].y;
+		int maxY = box[0].y;
+		int minX = box[5].x;
+		int maxX = box[0].x;
+		
+		for (int i = minY; i < maxY; i++)
+		{
+			putPixel(minX, i, glm::vec3(1.0f, 1.0f, 1.0f));
+			//if (i < maxY - move && i>minY+move)
+				//putPixel(minX + move, i, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		}
+		for (int i = minY ; i < maxY  ; i++) {
+			putPixel(maxX, i, glm::vec3(1.0f, 1.0f, 1.0f));
+		//	if (i < maxY - move && i>minY + move)
+				//putPixel(maxX + move, i, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		}
+
+		drawLine2(box[0], box[4], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		//drawLine2(glm::vec3(box[5].x+move,box[0].y-move,0), box[4], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		drawLine2(box[2], box[7], glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+		
+
+
+
+
+
+
 	}
 
 }
@@ -926,11 +1029,10 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 	v3 = Scale(v3);
 
 
-	drawLine(v1, v2, points, normals, material, scene, shadingType, color);
-	drawLine(v2, v3, points, normals, material, scene, shadingType, color);
-	drawLine(v1, v3, points, normals, material, scene, shadingType, color);
+	//drawLine(v1, v2, points, normals, material, scene, shadingType, color);
+	//drawLine(v2, v3, points, normals, material, scene, shadingType, color);
+	//drawLine(v1, v3, points, normals, material, scene, shadingType, color);
 
-	
 
 	
 	
