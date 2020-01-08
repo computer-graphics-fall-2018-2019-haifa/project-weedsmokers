@@ -11,13 +11,14 @@
 #include "ImguiMenus.h"
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define INDEX2(width,x,y) ((x)+(y)*(width))*3
-static int X_width = 500;
-static int Y_width = 280;
+static int X_width = 1000;
+static int Y_width = 560;
 
 Renderer::Renderer(int viewportWidth, int viewportHeight, int viewportX, int viewportY) :
 	colorBuffer(nullptr),
 	zBuffer(nullptr)
 {
+	zBuffer = NULL;
 	initOpenGLRendering();
 	SetViewport(viewportWidth, viewportHeight, viewportX, viewportY);
 }
@@ -48,14 +49,19 @@ void Renderer::putPixel(int i, int j, const glm::vec3& color) const
 
 void Renderer::createBuffers(int viewportWidth, int viewportHeight)
 {
+
 	if (colorBuffer)
 	{
 		delete[] colorBuffer;
+		colorBuffer = NULL;
+
 	}
-	if (zBuffer)
+	if (zBuffer!=NULL)
 	{
 		delete[] zBuffer;
+		zBuffer = NULL;
 	}
+
 	colorBuffer = new float[3* viewportWidth * viewportHeight];
 	zBuffer = new float[ viewportWidth * (viewportHeight +1)];
 
@@ -110,9 +116,9 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 	int i,j;
 	std::vector<glm::vec3> points;
 	std::vector<glm::vec3> normals;
-	glm::vec4 point, normal, pointNormal;
-	glm::vec3 faceNormal,temp, tempNormal;
-	glm::vec3 vertex2;
+	glm::vec4 point;
+	glm::vec3 faceNormal,temp, tempNormal, normal, pointNormal;
+	glm::vec3 vertex2, vertex3;
 	glm::vec4 v1, v2;
 	
 	scaleMatrix[0][0] = model.vertices[0][0];
@@ -121,10 +127,10 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 	scaleMatrix[1][1] = model.vertices[0][1];
 	scaleMatrix[2][0] = model.vertices[0][2];
 	scaleMatrix[2][1] = model.vertices[0][2];
-	for (i = 0; i < model.vertices.size(); i++)
+/*	for (i = 0; i < model.vertices.size(); i++)
 	{
 		point = glm::vec4(model.vertices[i],1);
-		point = viewTransformation * modelViewMatrix * point;
+		point =projectionMatrix * viewTransformation * modelViewMatrix * point;
 		point.x = point.x / point.w;
 		point.y = point.y / point.w;
 		point.z = point.z / point.w;
@@ -137,29 +143,34 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		scaleMatrix[2][1] = std::min(scaleMatrix[2][1], point.z);
 
 
-	}
+	}*/
+	glm::vec4 vertex = glm::vec4(0, 0,0, 0);
+	glm::mat3x3 normMatrix = glm::transpose(glm::inverse(modelViewMatrix));
 	for (i = 0; i < model.faces.size(); i++)
 	{
 		for (int j = 0; j < 3; j++) {	// filling each face info in vector and sending it to be drawn.
 			point = glm::vec4(model.vertices[(model.faces[i].GetVertexIndex(j)) - 1], 1);
-			normal= glm::vec4(model.normals[(model.faces[i].GetNormalIndex(j)) - 1], 1);
-
+			normal = model.normals[(model.faces[i].GetNormalIndex(j)) - 1];
+			normal = normMatrix * normal;
+			normal = normalize(normal);
 			//normal = normal * inv(modelViewMatrix);
-			point = viewTransformation*modelViewMatrix * point;
-
+			point = projectionMatrix*viewTransformation*modelViewMatrix * point;
+			point.x = point.x / point.w;
+			point.y = point.y / point.w;
+			point.z = point.z / point.w;
+			
 
 			if (drawNormals)
 			{
-				temp = projectionMatrix * point;
-				tempNormal = normal;
-				tempNormal.x = float(normal.x / X_width);
-				tempNormal.y = float(normal.y / Y_width);
+				temp = point;
+				temp = Scale(temp);
 
-				pointNormal = glm::vec4(temp,1) + glm::vec4(tempNormal,1) * float(scene.getNoramlsLength());
-				temp.x = int(temp.x*X_width);
-				temp.y = int(temp.y*Y_width);
-				pointNormal.x = int(pointNormal.x*X_width);
-				pointNormal.y = int(pointNormal.y*Y_width);
+				//pointNormal = glm::vec4(temp, 1) + glm::vec4(tempNormal, 1) * float(scene.getNoramlsLength());
+				tempNormal.x = int(normal.x*scene.getNoramlsLength());
+				tempNormal.y = int(normal.y*scene.getNoramlsLength());
+				tempNormal.z = int(normal.z*scene.getNoramlsLength());
+
+				pointNormal = temp + tempNormal;
 
 				drawLine2(temp, pointNormal, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -171,16 +182,32 @@ void Renderer::drawModel(const Scene & scene,const MeshModel &model)
 		if (scene.getdrawFacesNormals())
 		{
 
-			glm::vec3 vertex = projectionMatrix*(glm::vec4(points[0],1) + glm::vec4(points[1], 1) + glm::vec4(points[2], 1)) / float(3);
+			 //vertex = projectionMatrix*(glm::vec4(points[0],1) + glm::vec4(points[1], 1) + glm::vec4(points[2], 1)) / float(3);
+			for (int k = 0; k < 3; k++)
+			{
+				point = glm::vec4(model.vertices[(model.faces[i].GetVertexIndex(k)) - 1], 1);
+				 point = projectionMatrix * viewTransformation*modelViewMatrix * point;
+				 point.x = point.x / point.w;
+				 point.y = point.y / point.w;
+				 point.z = point.z / point.w;
+
+				vertex = vertex +(point/float(3));
+
+			}
+			vertex2 = vertex;
+			vertex2 = Scale(vertex2);
 			//vertex.x = ReScaleX(vertex.x);
 			//vertex.y = ReScaleY(vertex.y);
-			vertex2 = vertex;
+
 			faceNormal = normalize(cross(points[1] - points[0], points[2] - points[0]));
-			vertex2 = vertex2 + faceNormal * float(scene.getFacesNoramlsLength());
-			vertex2.x = int(vertex2.x);
-			vertex2.y = int(vertex2.y);
-			vertex2.z = vertex.z;
-			drawLine2(vertex, vertex2, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+			faceNormal.x = int(faceNormal.x*float(scene.getFacesNoramlsLength()));
+			faceNormal.y = int(faceNormal.y*float(scene.getFacesNoramlsLength()));
+			faceNormal.z = int(faceNormal.z*float(scene.getFacesNoramlsLength()));
+
+			vertex3 = vertex2 + faceNormal;
+			
+			drawLine2(vertex2, vertex3, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), material, scene, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+			vertex = glm::vec4(0, 0, 0, 0);
 
 		}
 		drawTriangles(&points, &normals, scene, model,scaleMatrix);
@@ -609,7 +636,7 @@ void Renderer::drawLine(const glm::vec3 point0, const glm::vec3 point1, const st
 				}
 			}
 
-			if (glVertex.x >= 0 && glVertex.x <= viewportWidth && glVertex.y >= 0 && glVertex.y <= viewportWidth)
+			if (glVertex.x >= 0 && glVertex.x <= viewportWidth && glVertex.y >= 0 && glVertex.y <= viewportHeight)
 			{
 
 				if ((zBuffer[int((glVertex.x) + (glVertex.y)*(viewportWidth))] <= glVertex.z) );
@@ -827,7 +854,7 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 	Camera camera = scene.GetActiveCamera();		// Data needed to draw the model
 	glm::mat4x4 modelViewMatrix = model.GetWorldTransformation();
 	glm::mat4x4 projectionMatrix = camera.getProjectionTransformation();
-	glm::mat4x4 viewTransformation = camera.getviewTransformation();
+		glm::mat4x4 viewTransformation = camera.getviewTransformation();
 	Material material = model.getMaterial();
 	int shadingType = scene.getshadingType(); 
 	glm::vec3 v1, v2, v3,temp, v4, S, E;
@@ -844,6 +871,21 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 	normalP2 = (*normals)[1];
 	normalP3 = (*normals)[2];
 	color = getcolor(v1, normalP1, material, scene);
+
+	temp2 = projectionMatrix * viewTransformation*modelViewMatrix * glm::vec4(v1, 1);
+	v1.x = temp2.x / temp2[3];
+	v1.y = temp2.y / temp2[3];
+	v1.z = temp2.z / temp2[3];
+	temp2 = projectionMatrix * viewTransformation*modelViewMatrix * glm::vec4(v2, 1);
+	v2.x = temp2.x / temp2[3];
+	v2.y = temp2.y / temp2[3];
+	v2.z = temp2.z / temp2[3];
+	temp2 = projectionMatrix * viewTransformation*modelViewMatrix * glm::vec4(v3, 1);
+	//temp2 =  viewTransformation*modelViewMatrix * glm::vec4(v3, 1);
+	v3.x = temp2.x / temp2[3];
+	v3.y = temp2.y / temp2[3];
+	v3.z = temp2.z / temp2[3];
+
 	if (v1.y > v2.y)
 	{
 		temp = v1;
@@ -875,35 +917,22 @@ void Renderer::drawTriangles(const std::vector<glm::vec3>* points, const std::ve
 		normalP2 = temp;
 	}
 	
-	temp2=  viewTransformation*modelViewMatrix * glm::vec4(v1,1);
-	v1.x = temp2.x / temp2[3];
-	v1.y = temp2.y / temp2[3];
-	v1.z = temp2.z / temp2[3];
-	temp2 =  viewTransformation*modelViewMatrix * glm::vec4(v2, 1);
-	v2.x = temp2.x / temp2[3];
-	v2.y = temp2.y / temp2[3];
-	v2.z = temp2.z / temp2[3];
-	//temp2 = projectionMatrix * viewTransformation*modelViewMatrix * glm::vec4(v3, 1);
-	temp2 =  viewTransformation*modelViewMatrix * glm::vec4(v3, 1);
-	v3.x = temp2.x / temp2[3];
-	v3.y = temp2.y / temp2[3];
-	v3.z = temp2.z / temp2[3];
 
-	v1 = ReScale(v1, scaleMatrix);
-	v2 = ReScale(v2, scaleMatrix);
-	v3 = ReScale(v3, scaleMatrix);
+	//v1 = ReScale(v1, scaleMatrix);
+	//v2 = ReScale(v2, scaleMatrix);
+	//v3 = ReScale(v3, scaleMatrix);
 	v1 = Scale(v1);
 	v2 = Scale(v2);
 	v3 = Scale(v3);
 
 
-	//drawLine(v1, v2, points, normals, material, scene, shadingType, color);
-	//drawLine(v2, v3, points, normals, material, scene, shadingType, color);
-	//drawLine(v1, v3, points, normals, material, scene, shadingType, color);
+	drawLine(v1, v2, points, normals, material, scene, shadingType, color);
+	drawLine(v2, v3, points, normals, material, scene, shadingType, color);
+	drawLine(v1, v3, points, normals, material, scene, shadingType, color);
 
 	
 
-
+	
 	
 
 	if (v2.y - v1.y > 0)
@@ -1061,9 +1090,9 @@ int	Renderer::ReScaleZ(float num, glm::mat3x2 scaleMatrix)
 
 glm::vec3	Renderer::ReScale(glm::vec3& v, glm::mat3x2 scaleMatrix)
 {
-	v.x = (((v.x - scaleMatrix[0][1]) / (scaleMatrix[0][0] - scaleMatrix[0][1])));
-	v.y = (((v.y - scaleMatrix[1][1]) / (scaleMatrix[1][0] - scaleMatrix[1][1])));
-	v.z = (((v.z - scaleMatrix[2][1]) / (scaleMatrix[2][0] - scaleMatrix[2][1])));
+	//v.x = (((v.x - scaleMatrix[0][1]) / (scaleMatrix[0][0] - scaleMatrix[0][1])));
+	//v.y = (((v.y - scaleMatrix[1][1]) / (scaleMatrix[1][0] - scaleMatrix[1][1])));
+	//v.z = (((v.z - scaleMatrix[2][1]) / (scaleMatrix[2][0] - scaleMatrix[2][1])));
 	return v;
 }
 

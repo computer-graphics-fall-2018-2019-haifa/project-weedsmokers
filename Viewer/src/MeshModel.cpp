@@ -21,8 +21,8 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	Aroundx = 0;
 	AroundY = 0;
 	AroundZ = 0;
-	scaleX = 1;
-	scaleY = 1;
+	scaleX = 10;
+	scaleY = 10;
 	TranslateX = 0;
 	TranslateY = 0;
 	MeshModel::faces = faces;
@@ -142,16 +142,20 @@ void MeshModel::SetWorldTransformation(const glm::mat4x4& worldTransform)
 
 const glm::mat4x4& MeshModel::GetWorldTransformation() const
 {
-
-	glm::mat4x4 A= worldTransform;
-	A = glm::translate(A, glm::vec3(TranslateX, TranslateY, 1));
-	//A = glm::rotate(A, deg, { Aroundx, AroundY, AroundZ });
+	
+	glm::mat4x4 C,A= worldTransform;
+	A= glm::scale(A, glm::vec3(scaleX, scaleY, 1));
 	A = glm::rotate(A, Aroundx, { 1, 0, 0 });
 	A = glm::rotate(A, AroundY, { 0, 1, 0 });
 	A = glm::rotate(A, AroundZ, { 0, 0, 1 });
-	A =  glm::scale(A, glm::vec3(scaleX, scaleY, 1));
+	A = glm::translate(A, glm::vec3(TranslateX, TranslateY, 1));
+	C = glm::translate(A, glm::vec3(TranslateX, TranslateY, 1));
+
+	//A = glm::rotate(A, deg, { Aroundx, AroundY, AroundZ });
+	
+	C[3][2] = 0;
 	//return worldTransform;
-	return  A;
+	return  C;
 }
 
 void MeshModel::setDrawing(bool drawBox, bool drawNormals, bool drawFacesNormals)

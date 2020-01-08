@@ -54,7 +54,7 @@ private:
 	int faceNormalsLength = 10;
 	glm::vec2 size;
 	glm::vec4 ambientLightColor ;
-	bool draw;
+	bool draw=true;
 public:
 	ParallelLight getParallelLightAtIndex(int i);
 	PointLight getPointLightAtIndex(int i);

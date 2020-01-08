@@ -3,6 +3,8 @@
 #include "Camera.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+
 
 Camera::Camera():eye(glm::vec4(0, 0, 1.0, 0)),at(glm::vec4(0, 0, 0, 0)),up(glm::vec4(0, 1.0, 0, 0))
 {
@@ -64,7 +66,7 @@ void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const gl
 	viewTransformation[3][1] = -dot(u, eye);
 	viewTransformation[3][2] = -dot(f, eye);
 
-
+	viewTransformation = glm::lookAt(eye, at, up);
 
 
 

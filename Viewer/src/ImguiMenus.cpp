@@ -29,7 +29,7 @@ bool perspective=true;
 bool orthographic=false;
 int normalsLength=5;
 int faceNormalsLength=5;
-float fovy = 2.75, aspect = 1.0, Near = 0.1, Far =200;
+float fovy = 1, aspect = 1.0, Near = 0.1, Far =200;
 float left = -3, right = 3, bottom = -3, top = 3, Near2 = 0.1, Far2 = 200;
 float zoom = 2.0;
 Material activeModelMaterial;
@@ -96,10 +96,15 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			if (perspective)
 			{
 				orthographic = false;
-				ImGui::SliderFloat("fovy", &fovy, 2.5, 3);
+				/*ImGui::SliderFloat("fovy", &fovy, 2.5, 3);
 				ImGui::SliderFloat("aspect", &aspect, 0.5, 10)  ;
 				ImGui::SliderFloat("near", &Near, -10, 200);
-				ImGui::SliderFloat("far", &Far, -10, 200);
+				ImGui::SliderFloat("far", &Far, -10, 200);*/
+				ImGui::SliderFloat("fovy", &fovy, -1, 10);
+				ImGui::SliderFloat("aspect", &aspect, 0, 10);
+				ImGui::SliderFloat("near", &Near, -100, 2000);
+				ImGui::SliderFloat("far", &Far, -100, 2000);
+
 				scene.setActiveCameraPerspective(fovy, aspect, Near, Far);
 			}
 
@@ -107,10 +112,16 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			if (orthographic)
 			{
 				perspective = false;
-				ImGui::SliderFloat("left ", &left, -5, -2);
+				/*ImGui::SliderFloat("left ", &left, -5, -2);
 				ImGui::SliderFloat("right", &right, 2, 5);
 				ImGui::SliderFloat("bottom", &bottom, -5, 2);
 				ImGui::SliderFloat("top", &top, 2, 5);
+				ImGui::SliderFloat("near", &Near2, -10, 200);
+				ImGui::SliderFloat("far", &Far2, -10, 200);*/
+				ImGui::SliderFloat("left ", &left, -10, 10);
+				ImGui::SliderFloat("right", &right, -10, 10);
+				ImGui::SliderFloat("bottom", &bottom, -10, 10);
+				ImGui::SliderFloat("top", &top, -10, 10);
 				ImGui::SliderFloat("near", &Near2, -10, 200);
 				ImGui::SliderFloat("far", &Far2, -10, 200);
 
@@ -142,7 +153,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::SliderFloat("Camera Looking At Y:", &at.y, -1, 10);
 			ImGui::SliderFloat("Camera Looking At Z", &at.z, -1, 10);
 			//ImGui::Text("Choose world or view frame:", counter);
-			ImGui::SliderInt("Choose world or view frame:", &i5, 1, 2);
+			//ImGui::SliderInt("Choose world or view frame:", &i5, 1, 2);
 
 			/*ImGui::SliderFloat("RoateAroundX", &AroundX, -180, 180);
 			ImGui::SliderFloat("Camera X Position:", &x1, -1, 10);
@@ -191,13 +202,13 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			static int i2 = 0;
 		}
 
-		static float scaleX = 1;
-		static float scaleY = 1;
+		static float scaleX = 3;
+		static float scaleY = 3;
 		static float TranslateX =0.2;
 		static float TranslateY = 0.2;
 		static float TranslateX1 = 0;
 		static float TranslateY1 = 0;
-		scene.ScaleActiveModel(scaleX/20+zoom/10, scaleY/20+zoom/10);
+		scene.ScaleActiveModel(scaleX+zoom/10, scaleY+zoom/10);
 		scene.TranslateActiveModel(TranslateX, TranslateY);
 		if (ImGui::CollapsingHeader("Object setting"))
 		{	
@@ -211,7 +222,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			}
 			ImGui::SliderFloat("scaleX", &scaleX, 0.01, 10);
 			ImGui::SliderFloat("scaleY", &scaleY, 0.01, 10);
-			scene.ScaleActiveModel(scaleX/20+zoom/10, scaleY/20+zoom/10);	
+			scene.ScaleActiveModel(scaleX+zoom/10, scaleY+zoom/10);	
 			
 			ImGui::Text("Model frame:");
 			ImGui::SliderFloat("TranslateX", &TranslateX, -1, 1);		
