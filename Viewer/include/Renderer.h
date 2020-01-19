@@ -55,6 +55,7 @@ public:
 	void ClearColorBuffer(const glm::vec3& color);
 	void SetViewport(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
 	void drawModel(const Scene & scene, const MeshModel & model);
+	float* bloom_light(float* image);
 
 	//void putPixel2(int i, int j, const glm::vec3& color);
 

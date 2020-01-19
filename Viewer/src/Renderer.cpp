@@ -11,6 +11,9 @@
 #include "ImguiMenus.h"
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define INDEX2(width,x,y) ((x)+(y)*(width))*3
+typedef std::vector<double> Array;
+typedef std::vector<Array> Matrix;
+typedef std::vector<Matrix> Image;
 static int X_width = 500;
 static int Y_width = 280;
 
@@ -339,52 +342,35 @@ void Renderer::Render(const Scene& scene)
 }
 void Renderer::Bloom(const Scene& scene, float *buffer)
 {
-	int i, j, k;
-	glm::vec3 color;
+	// let's find where there is strong lights
+	float* strongLights = Renderer::bloom_light(buffer);
+	//now let's strengthen the lights in order to make the bloom
 
-	
-	float *temp = new float[3 * viewportWidth * viewportHeight];
-	for (i = 0; i <= 3 * viewportWidth * viewportHeight; i++)
-		temp[i] = 0;
-	std::vector<PointLight> PointLight1= scene.getPointLights();
-	PointLight tempParallel;
-	glm::vec3 pos;
-	for (k = 0; k < PointLight1.size(); k++)
-	{
-		tempParallel = PointLight1[k];
-		pos = tempParallel.position;
-		//pos.x = int(pos.x*viewportWidth);
-	//	pos.y = int(pos.y*viewportHeight);
-		color = tempParallel.color;
-		for (i = pos.x - 5; i < pos.x + 5 && i < viewportWidth - 5 && i>0; i++)
-			for (j = pos.y - 5; j < pos.y + 5 && j < viewportHeight - 5 && j>0; j++)
-			{
-				
-				temp[(i + j * viewportWidth) * 3 + 0] = color.x;
-				temp[(i + j * viewportWidth) * 3 + 1] = color.y;
-				temp[(i + j * viewportWidth) * 3 + 2] = color.z;
-			}
-	}
-	
-	blurScreen(temp,false);
-	blurScreen(temp,false);
-	blurScreen(temp,false);
-	float k1, k2;
-	for (i = 0; i <= 3 * viewportWidth * viewportHeight; i++)
-	{
-		k1 = buffer[i];
-		k2 = temp[i];
-		buffer[i] = buffer[i] + temp[i];
-	}
-	for (i = 3; i < viewportWidth - 3; i++)
-		for (j = 3; j < viewportHeight - 3; j++)
+	for (int i = 0; i < viewportHeight; i++) {
+		for (int j = 0; j < viewportWidth; j++)
 		{
-			color.x = buffer[(i + j * viewportWidth) * 3 + 0];
-			color.y = buffer[(i + j * viewportWidth) * 3 + 1];
-			color.z = buffer[(i + j * viewportWidth) * 3 + 2];
-			putPixel(i, j, color);
+			float sum = strongLights[(i + j * viewportWidth) * 3 + 0] + strongLights[(i + j * viewportWidth) * 3 + 1] + strongLights[(i + j * viewportWidth) * 3 + 2];
+			if (sum != 0.00f)
+			{
+				buffer[(i + j * viewportWidth) * 3 + 0] += strongLights[(i + j * viewportWidth) * 3 + 0];
+				buffer[(i + j * viewportWidth) * 3 + 1] += strongLights[(i + j * viewportWidth) * 3 + 1];
+				buffer[(i + j * viewportWidth) * 3 + 2] += strongLights[(i + j * viewportWidth) * 3 + 2];
+			}
 		}
-//	delete[] temp;
+	}
+
+	//int** Filter_Freqencies = new int*[viewportHeight];
+	//for (int f = 0; f < viewportHeight; f++) {
+	//	Filter_Freqencies[f] = new int[viewportWidth];
+	//}
+	//Matrix Filter_Freqencies;
+	//Filter_Freqencies =  getGaussian(viewportHeight, viewportWidth, 10.0);
+	/*Convolved_Frequencies = Image_Frequencies * Filter_Freqencies;
+	1. Image_Frequencies = FFT(Image)
+2. Filter_Frequencies = FFT(Filter)
+3. Convolved_Frequencies = Image_Frequencies x Filter_Freqencies
+4. Convolved_Image = InverseFFT(Convolved_Frequencies)
+	Convolved_Image*/
 }
 
 
@@ -403,7 +389,7 @@ void Renderer::blurScreen(float *buffer,bool print)
 			k1 = buffer[(i + j * viewportWidth) * 3 + 0];
 			x1 = buffer[(i + j * viewportWidth) * 3 + 0] * 0.2 + buffer[(i - 1 + j * viewportWidth) * 3 + 0] * 0.1 + buffer[(i+1 + j * viewportWidth) * 3 + 0] * 0.1;
 			x2 = buffer[(i + (j+1) * viewportWidth) * 3 + 0] * 0.1 + buffer[(i - 1 + (j+1) * viewportWidth) * 3 + 0] * 0.1 + buffer[(i + 1 + (j+1) * viewportWidth) * 3 + 0] * 0.1;
-			x3 = buffer[(i + (j -1) * viewportWidth) * 3 + 0] * 0.1 + buffer[(i - 1 + (j - 1) * viewportWidth) * 3 + 0] * 0.1 + buffer[(i + 1 + (j - 1) * viewportWidth) * 3 + 0] * 0.0275;
+			x3 = buffer[(i + (j -1) * viewportWidth) * 3 + 0] * 0.1 + buffer[(i - 1 + (j - 1) * viewportWidth) * 3 + 0] * 0.1 + buffer[(i + 1 + (j - 1) * viewportWidth) * 3 + 0] * 0.1;
 			temp[(i + j * viewportWidth) * 3 + 0] = x1 + x2 + x3;
 			k2 = temp[(i + j * viewportWidth) * 3 + 0];
 			x1 = buffer[(i + j * viewportWidth) * 3 + 1] * 0.2 + buffer[(i - 1 + j * viewportWidth) * 3 + 1] * 0.1 + buffer[(i + 1 + j * viewportWidth) * 3 + 1] * 0.1;
@@ -1274,4 +1260,57 @@ glm::vec3 Renderer::calculatepointLight(const glm::vec3 vertex, const glm::vec3 
 		return attenuation * (diffuse + specular);
 
 	
+}
+/*
+Matrix getGaussian(int height, int width, double sigma)
+{
+	Matrix kernel(height, Array(width));
+	double sum = 0.0;
+	int i, j;
+
+	for (i = 0; i < height; i++) {
+		for (j = 0; j < width; j++) {
+			kernel[i][j] = exp(-(i * i + j * j) / (2 * sigma * sigma)) / (2 * M_PI * sigma * sigma);
+			sum += kernel[i][j];
+		}
+	}
+
+	for (i = 0; i < height; i++) {
+		for (j = 0; j < width; j++) {
+			kernel[i][j] /= sum;
+		}
+	}
+
+	return kernel;
+}*/
+
+
+float* Renderer::bloom_light(float* image)
+{
+	float* light = new float[3 * viewportHeight * viewportWidth];
+	int i, j;
+	for (i = 0; i < viewportHeight; i++)
+	{
+		for (j = 0; j < viewportWidth; j++)
+		{
+			light[(i + j * viewportWidth) * 3 + 0] = 0.00f;
+			light[(i + j * viewportWidth) * 3 + 1] = 0.00f;
+			light[(i + j * viewportWidth) * 3 + 2] = 0.00f;
+		}
+	}
+
+
+	for (i = 0; i < viewportHeight; i++)
+	{
+		for (j = 0; j < viewportWidth; j++)
+		{
+			if (image[(i + j * viewportWidth) * 3 + 0] > 0.85 || image[(i + j * viewportWidth) * 3 + 1] > 0.85 || image[(i + j * viewportWidth) * 3 + 2] > 0.85)
+			{
+				light[(i + j * viewportWidth) * 3 + 0] = image[(i + j * viewportWidth) * 3 + 0];
+				light[(i + j * viewportWidth) * 3 + 1] = image[(i + j * viewportWidth) * 3 + 1];
+				light[(i + j * viewportWidth) * 3 + 2] = image[(i + j * viewportWidth) * 3 + 2];
+			}
+		}
+	}
+	return light;
 }
